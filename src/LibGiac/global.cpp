@@ -5194,6 +5194,12 @@ gen make_symbolic(const gen & op, const gen & args) {
 volatile bool signal_plot_child = false; // true if child can continue
 
 void kill_and_wait_sigusr2() {
+#if defined flagWIN32 && defined flagGCC
+	std::cout << "ERROR\r\n";
+	std::string s;
+	std::cin >> s;
+	exit(1);
+#else
 	sigset_t mask, oldmask;
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGUSR2);
@@ -5208,6 +5214,7 @@ void kill_and_wait_sigusr2() {
 	while (!signal_plot_child)
 		sigsuspend(&oldmask);
 	sigprocmask(SIG_UNBLOCK, &mask, NULL);
+#endif
 #endif
 }
 
