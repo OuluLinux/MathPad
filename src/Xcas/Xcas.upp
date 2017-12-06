@@ -1,0 +1,46 @@
+uses
+	CtrlLib,
+	LibGiac,
+	CodeEditor;
+
+file
+	Copying,
+	main.cpp,
+	app.tpp,
+	Xcas.h,
+	Xcas.cpp,
+	Xcas.lay,
+	Xcas.iml,
+	CasEdit.h,
+	CasEdit.cpp,
+	Editor.h,
+	Editor.cpp,
+	Input.h,
+	Input.cpp,
+	Equation.h,
+	Equation.cpp,
+	Graph.h,
+	Graph.cpp,
+	Graph3D.h,
+	Graph3D.cpp,
+	Common.h,
+	Common.cpp,
+	Original readonly separator,
+	HistoryPack_.h,
+	HistoryPack_.cpp,
+	Editor_.h,
+	Editor_.cpp,
+	Input_.h,
+	Input_.cpp,
+	Table_.h,
+	Table_.cpp,
+	Graph_.h,
+	Graph_.cpp,
+	Graph3D_.h,
+	Graph3D_.cpp,
+	Print_.h,
+	Print_.cpp;
+
+mainconfig
+	"" = "GUI";
+

@@ -17,7 +17,7 @@ using namespace std;
 #include "index.h"
 #include "modpoly.h"
 
-#ifdef flagPOSIX
+#if defined flagPOSIX || (defined __x86_64__ && defined flagWIN32 && defined flagGCC)
 typedef __int128 int128_t;
 #endif
 
