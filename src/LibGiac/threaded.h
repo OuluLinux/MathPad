@@ -646,7 +646,7 @@ void smallsub(const std::vector< T_unsigned<T, U> > & v1, const std::vector< T_u
 	if (&v1 == &v || &v2 == &v) {
 		std::vector< T_unsigned<T, U> > tmp;
 		smallsub(v1, v2, tmp, reduce);
-		std::swap< std::vector< T_unsigned<T, U> > >(v, tmp);
+		swap(v, tmp);
 		return;
 	}
 	typename std::vector< T_unsigned<T, U> >::const_iterator it1 = v1.begin(), it1end = v1.end(), it2 = v2.begin(), it2end = v2.end();
@@ -1028,7 +1028,7 @@ void smallmult(const std::vector< T_unsigned<T, U> > & v1, const std::vector< T_
 	if (&v1 == &v || &v2 == &v) {
 		std::vector< T_unsigned<T, U> > tmp;
 		smallmult(v1, v2, tmp, reduce, possible_size);
-		std::swap< std::vector< T_unsigned<T, U> > >(v, tmp);
+		std::swap(v, tmp);
 		return;
 	}
 	typename std::vector< T_unsigned<T, U> >::const_iterator it1beg = v1.begin(), it1 = v1.begin(), it1end = v1.end(), it2beg = v2.begin(), it2, it2end = v2.end();

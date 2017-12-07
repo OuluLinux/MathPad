@@ -223,11 +223,13 @@
 
 
 
+
+
 #if !defined DOUBLEVAL && (defined __amd64 || defined __x86_64 || defined _WIN64)
-#define DOUBLEVAL 1
-#define __x86_64__ 1
-
-
-
+	#define DOUBLEVAL 1
+	#define __x86_64__ 1
+#elif defined flagMSC
+	#define DOUBLEVAL 1
 #endif
+
 

@@ -343,17 +343,17 @@ struct unary_function_ptr {
 #ifdef NO_UNARY_FUNCTION_COMPOSE
 	inline unary_function_eval * ptr() const {
 #ifdef __x86_64__
-		return (unary_function_eval *)(((ulonglong) _ptr & ~(1)));
+		return (unary_function_eval *)(((ulonglong) _ptr & ~((ulonglong)1)));
 #else
-		return (unary_function_eval *)(((size_t) _ptr & ~(1)));
+		return (unary_function_eval *)(((size_t) _ptr & ~((size_t)1)));
 #endif
 	}
 #else
 	inline unary_function_abstract * ptr() const {
 #ifdef __x86_64__
-		return (unary_function_abstract *)(((ulonglong) _ptr & ~(1)));
+		return (unary_function_abstract *)(((ulonglong) _ptr & ~((ulonglong)1)));
 #else
-	return (unary_function_abstract *)(((size_t) _ptr & ~(1)));
+	return (unary_function_abstract *)(((size_t) _ptr & ~((size_t)1)));
 #endif
 	}
 #endif
@@ -361,18 +361,18 @@ struct unary_function_ptr {
 	inline bool operator ==(const unary_function_ptr & u) const {
 		// if (&u==this) return true;
 #ifdef __x86_64__
-		return ((ulonglong)(_ptr) & ~(1))  == ((ulonglong)(u._ptr) & ~(1));
+		return ((ulonglong)(_ptr) & ~((ulonglong)1))  == ((ulonglong)(u._ptr) & ~((ulonglong)1));
 #else
-		return ((size_t)(_ptr) & ~(1)) == ((size_t)(u._ptr) & ~(1));
+		return ((size_t)(_ptr) & ~((size_t)1)) == ((size_t)(u._ptr) & ~((size_t)1));
 #endif
 	}
 	inline bool operator !=(const unary_function_ptr & u) const { return !(*this == u); }
 	inline bool operator ==(const unary_function_ptr * u) const {
 		// if (&u==this) return true;
 #ifdef __x86_64__
-		return u && (((ulonglong)(_ptr) & ~(1)) == ((ulonglong)(u->_ptr) & ~(1)));
+		return u && (((ulonglong)(_ptr) & ~((ulonglong)1)) == ((ulonglong)(u->_ptr) & ~((ulonglong)1)));
 #else
-		return u && (((size_t)(_ptr) & ~(1)) == ((size_t)(u->_ptr) & ~(1)));
+		return u && (((size_t)(_ptr) & ~((size_t)1)) == ((size_t)(u->_ptr) & ~((size_t)1)));
 #endif
 	}
 	inline bool operator !=(const unary_function_ptr * u) const { return !(*this == u); }

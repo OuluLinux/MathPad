@@ -5,6 +5,37 @@
 #include <LibGiac/mathml.h>
 
 
+// At some point Visual C compiler did not include these.
+#ifdef flagMSC
+extern "C" {
+__declspec(noalias) void __cdecl __std_reverse_trivially_swappable_4(void * _First, void * _Last) _NOEXCEPT {
+	int* f = (int*)_First;
+	int* l = (int*)_Last;
+	while (f != l) {
+		int i = *f;
+		*f = *l;
+		*l = i;
+		f++;
+		if (f == l) break;
+		l--;
+	}
+}
+__declspec(noalias) void __cdecl __std_reverse_trivially_swappable_8(void * _First, void * _Last) _NOEXCEPT {
+	typedef __int64 I64;
+	I64* f = (I64*)_First;
+	I64* l = (I64*)_Last;
+	while (f != l) {
+		I64 i = *f;
+		*f = *l;
+		*l = i;
+		f++;
+		if (f == l) break;
+		l--;
+	}
+}
+}
+#endif
+
 int main() {
 	std::string s;
 	

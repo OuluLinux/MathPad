@@ -5185,7 +5185,7 @@ const size_t * const builtin_lexer_functions_ = 0;
 
 #endif
 
-#endif // NSPIRE
+#endif
 
 gen make_symbolic(const gen & op, const gen & args) {
 	return symbolic(*op._FUNCptr, args);
@@ -5194,7 +5194,7 @@ gen make_symbolic(const gen & op, const gen & args) {
 volatile bool signal_plot_child = false; // true if child can continue
 
 void kill_and_wait_sigusr2() {
-#if defined flagWIN32 && defined flagGCC
+#if defined flagWIN32
 	std::cout << "ERROR\r\n";
 	std::string s;
 	std::cin >> s;
