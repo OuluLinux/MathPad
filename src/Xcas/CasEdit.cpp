@@ -22,10 +22,12 @@ CasItem* CasEdit::GetSelectedItem() {
 
 RichText CasEdit::Get() {
 	
+	return RichText();
 }
 
 String CasEdit::GetXml() {
 	
+	return "";
 }
 
 CasGroup& CasEdit::GetSelectedGroup() {

@@ -1,7 +1,8 @@
 uses
 	CtrlLib,
 	LibGiac,
-	CodeEditor;
+	CodeEditor,
+	PdfDraw;
 
 file
 	Copying,
