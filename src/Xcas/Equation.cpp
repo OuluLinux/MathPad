@@ -15,9 +15,9 @@ struct Fl_Color {
 	Fl_Color(int i) {}
 };
 
-Fl_Font FL_HELVETICA;
-Fl_Font FL_TIMES_BOLD_ITALIC;
-Fl_Font FL_TIMES_ITALIC;
+Fl_Font FL_HELVETICA = SansSerif(15);
+Fl_Font FL_TIMES_BOLD_ITALIC = Serif(15).Bold().Italic();
+Fl_Font FL_TIMES_ITALIC = Serif(15).Italic();
 int FL_BLUE;
 //int undef;
 //int clip_x, clip_y, clip_w, clip_h;
@@ -29,8 +29,9 @@ Color clr;
 Draw* draw;
 
 void fl_font(Fl_Font i, int size) {
-	fnt_sz = 15;
-	fnt = SansSerif(fnt_sz);
+	fnt_sz = size;
+	fnt = i;
+	fnt.Height(fnt_sz);
 }
 
 void fl_color(Fl_Color c) {
@@ -47,7 +48,7 @@ void fl_point(int x, int y) {
 }
 
 void fl_line(int x0, int y0, int x1, int y1) {
-	draw->DrawLine(x0, y0, x1, y1, 1, clr);
+	draw->DrawLine(x0, y0-2, x1, y1-2, 1, clr);
 }
 
 void fl_rect(int x, int y, int w, int h) {

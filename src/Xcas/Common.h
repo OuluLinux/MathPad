@@ -5,6 +5,7 @@ namespace Xcas {
 
 
 class CasEdit;
+class CasGroup;
 
 
 struct ItemLabel : public Ctrl {

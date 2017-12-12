@@ -85,14 +85,12 @@ protected:
 	void Load(const String& filename);
 	void OpenFile(const String& fn);
 	void Destroy();
+	void NewEntry();
 	void Execute();
 	void ClearAnswers();
-	void NewParameter();
-	void MergeLevels();
-	void NewGroup();
-	void GroupSelectedLevels();
-	void DegroupSelectedLevels();
-	void NewEntry();
+	void RemoveRow();
+	void ClearDocument();
+	
 	void Index();
 	void About();
 	

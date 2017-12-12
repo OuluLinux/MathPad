@@ -94,12 +94,6 @@ void Xcas::MainBar(Bar& bar)
 		bar.Add("Open..", CtrlImg::open(), THISBACK(Open))
 		   .Key(K_CTRL_O)
 		   .Help("Open existing document");
-		bar.Sub("Insert from file", [=](Bar& bar) {
-			bar.Add("Xcas session", [&] {});
-			bar.Add("Figure", [&] {});
-			bar.Add("Spreadsheet", [&] {});
-			bar.Add("Program", [&] {});
-		});
 		bar.Add("Save", CtrlImg::save(), THISBACK(Save))
 			.Key(K_CTRL_S)
 			.Help("Save current document");
@@ -119,88 +113,63 @@ void Xcas::MainBar(Bar& bar)
 	});
 	
 	bar.Sub("Edit", [=](Bar& bar) {
-		bar.Add("Execute", CtrlImg::go_forward(), THISBACK(Execute))
+		bar.Add("Execute Document", CtrlImg::go_forward(), THISBACK(Execute))
 			.Key(K_F5)
 			.Help("Execute the worksheet of the currently open tab.");
+		bar.Add("New Entry", CtrlImg::Add(), THISBACK(NewEntry))
+			.Key(K_CTRL_E);
+		bar.Add("Remove entry", CtrlImg::Remove(), THISBACK(RemoveRow))
+			.Key(K_CTRL | K_SHIFT | K_D)
+			.Help("Remove currently selected entry.");
 		bar.Add("Clear answers", THISBACK(ClearAnswers))
 			.Key(K_CTRL | K_SHIFT | K_C)
 			.Help("Clear all what was printed during execution.");
-		bar.Add("New Parameter", THISBACK(NewParameter))
-			.Key(K_CTRL_P)
-			.Help("");
-		bar.Separator();
-		bar.Add("Merge selected levels", THISBACK(MergeLevels));
-		bar.Add("New group", THISBACK(NewGroup));
-		bar.Add("Group selected levels", THISBACK(GroupSelectedLevels));
-		bar.Add("Degroup selected levels", THISBACK(DegroupSelectedLevels));
+		bar.Add("Clear document", CtrlImg::new_doc(), THISBACK(ClearDocument))
+			.Key(K_CTRL | K_SHIFT | K_N)
+			.Help("Cleal the document. Remove all rows.");
 	});
 	
-	bar.Sub("Toolbox", [=](Bar& bar) {
-		bar.Add("New Entry", THISBACK(NewEntry))
-			.Key(K_ALT_N)
-			.Help("");
-		bar.Add("New Comment", [&] {});
-		//TODO: fill functions automatically from index
-	});
-	
-	bar.Sub("Expression", [=](Bar& bar) {
-		bar.Add("New Expression", [&] {editor.NewExpression();})
-			.Key(K_ALT_E);
-		//TODO: fill functions automatically from index
-	});
-	
-	bar.Sub("Commands", [=](Bar& bar) {
-		//TODO: fill functions automatically from index
-	});
-	
-	bar.Sub("Program", [=](Bar& bar) {
-		bar.Add("New Program", [&] {})
-			.Key(K_ALT_P);
-		bar.Add("debug: debug a program", [&] {});
-		//TODO: fill functions automatically from index
-	});
-	
-	bar.Sub("Graphic", [=](Bar& bar) {
-		//TODO: fill functions automatically from index
-	});
-	
-	bar.Sub("Geography", [=](Bar& bar) {
-		//TODO: fill functions automatically from index
-	});
-	
-	bar.Sub("Spreadsheet", [=](Bar& bar) {
-		bar.Add("New Spreadsheet", [&] {})
-			.Key(K_ALT_T);
-		//TODO:
-	});
-	
-	bar.Sub("Physics", [=](Bar& bar) {
-		//TODO: fill units automatically from index
-	});
-	
-	bar.Sub("Turtle", [=](Bar& bar) {
-		bar.Add("New Turtle", [&] {})
-			.Key(K_ALT_D);
-		//TODO: turtle moves
-	});
-	
-	bar.Sub("Examples", [=](Bar& bar) {
-		//TODO: fill units automatically from index
-	});
-	
+	if (!bar.IsToolBar()) {
+		bar.Sub("Expression", [=](Bar& bar) {
+			
+		});
+		
+		bar.Sub("Toolbox", [=](Bar& bar) {
+			
+		});
+		
+		bar.Sub("Commands", [=](Bar& bar) {
+			
+		});
+		
+		bar.Sub("Program", [=](Bar& bar) {
+			
+		});
+		
+		bar.Sub("Physics", [=](Bar& bar) {
+			
+		});
+		
+		bar.Sub("Common", [=](Bar& bar) {
+			
+		});
+		
+		bar.Sub("Examples", [=](Bar& bar) {
+			
+		});
+	}
 	
 	bar.Sub("Help", [=](Bar& bar) {
-		bar.Add("Index", THISBACK(Index));
+		bar.Add("Index", XcasImg::question(), THISBACK(Index));
+		bar.Add("About..", XcasImg::information(), THISBACK(About));
 		
-		bar.Add("Help topics", [&] {
+		bar.Add("Help topics",XcasImg::help(), [&] {
 			HelpWindow help;
 			help.GoTo("topic://Topic/app/main$en-us");
 			help.Execute();
 		})
 			.Key(K_F1)
 			.Help("Opens help window");
-		
-		bar.Add("About..", THISBACK(About));
 	});
 }
 
@@ -295,30 +264,20 @@ void Xcas::ClearAnswers() {
 	
 }
 
-void Xcas::NewParameter() {
+void Xcas::RemoveRow() {
 	
 }
 
-void Xcas::MergeLevels() {
-	
-}
-
-void Xcas::NewGroup() {
-	
-}
-
-void Xcas::GroupSelectedLevels() {
-	
-}
-
-void Xcas::DegroupSelectedLevels() {
+void Xcas::ClearDocument() {
 	
 }
 
 void Xcas::NewEntry() {
-	CasItem* item = editor.GetSelectedItem();
+	CasItem* item = editor.GetSelectedGroup().GetSelectedItem();
 	if (item)
 		item->NewEntry();
+	else
+		editor.NewExpression();
 }
 
 void Xcas::Index() {
