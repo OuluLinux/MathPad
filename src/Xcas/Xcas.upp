@@ -43,5 +43,6 @@ file
 	Print_.cpp;
 
 mainconfig
-	"" = "GUI";
+	"" = "GUI",
+	"" = "GUI USEMALLOC";
 

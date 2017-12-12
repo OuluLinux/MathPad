@@ -392,7 +392,8 @@ namespace giac {
   void Mul ( typename std::vector< monomial<T> >::const_iterator & a,
 	     typename std::vector< monomial<T> >::const_iterator & a_end,
 	     const T & fact, std::vector< monomial<T> > & new_coord){
-    if (new_coord.begin()==a){
+	std::vector< monomial<T> >::const_iterator begin = new_coord.begin();
+    if (begin==a){
       if (is_one(fact))
 	return;
       typename std::vector< monomial<T> >::iterator b=new_coord.begin(),b_end=new_coord.end();

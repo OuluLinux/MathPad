@@ -4,6 +4,9 @@
 namespace Xcas {
 
 
+class CasEdit;
+
+
 struct ItemLabel : public Ctrl {
 	String label;
 	bool is_selected = false;
@@ -15,15 +18,19 @@ class CasItem : public ParentCtrl {
 	
 protected:
 	friend class CasGroup;
+	friend class CasEdit;
+	friend class Editor;
 	
 	ItemLabel label;
 	int indent = 0;
 	int height = 5;
 	bool is_selected = false;
+	CasGroup* group = NULL;
+	CasEdit* edit = NULL;
 	
-	
-	const int handleh = 5;
-	
+	static const int handleh = 5;
+	static const int min_height = 50;
+	static const int label_width = 15;
 	
 public:
 	typedef CasItem CLASSNAME;
@@ -42,8 +49,8 @@ public:
 	virtual void LeftUp(Point p, dword keyflags);
 	virtual Image CursorImage(Point p, dword keyflags);
 	virtual void Paint(Draw& w);
-	
-	
+	virtual int GetContentHeight() const {return height;}
+	virtual void RefreshLabel() {}
 	
 	Callback WhenSplitFinish;
 };
@@ -52,34 +59,58 @@ public:
 class CasGroup : public CasItem {
 	
 protected:
-	Array<CasItem> items;
-	ScrollBar sb;
-	Button expand;
-	Label title;
+	Array<CasItem>	items;
+	ScrollBar		sb;
+	Button			expand;
+	Label			title;
 	
 	
 public:
 	typedef CasGroup CLASSNAME;
 	CasGroup();
 	
-	CasItem* GetSelectedItem();
-	CasGroup& GetSelectedGroup();
+	CasItem*		GetSelectedItem();
+	CasGroup&		GetSelectedGroup();
+	virtual int		GetContentHeight() const;
 	
-	virtual void Layout();
+	virtual void	Layout();
+	virtual void	RefreshLabel();
 	
-	template <class T> T& Add() {T* o = new T(); items.Add(o); ParentCtrl::Add(*o); Layout(); return *o;}
+	template <class T> T& Add() {
+		T* o = new T();
+		o->group = this;
+		o->edit = edit;
+		items.Add(o);
+		ParentCtrl::Add(*o);
+		Layout();
+		return *o;
+	}
 	
 };
 
 
 class GenOutput : public ParentCtrl {
 	
+public:
+	//friend class Editor;
+	giac::context* ctx = NULL;
+	giac::gen value;
 	
+public:
+	virtual void Set(giac::gen& g) {value = g;}
+	virtual int GetContentHeight() {return 0;}
 };
 
 
 class CommentOutput : public ParentCtrl {
+	Label lbl;
 	
+public:
+	typedef CommentOutput CLASSNAME;
+	CommentOutput();
+	
+	void Add(String comment);
+	void Clear();
 	
 };
 

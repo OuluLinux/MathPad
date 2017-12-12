@@ -24,6 +24,17 @@
 #ifndef _Xcas_Xcas_h
 #define _Xcas_Xcas_h
 
+#include <LibGiac/gen.h>
+#include <LibGiac/prog.h>
+#include <LibGiac/mathml.h>
+#include <LibGiac/alg_ext.h>
+#include <LibGiac/usual.h>
+#include <LibGiac/rpn.h>
+#include <LibGiac/symbolic.h>
+#include <LibGiac/intg.h>
+#include <LibGiac/series.h>
+#include <LibGiac/quater.h>
+
 #include <CtrlLib/CtrlLib.h>
 #include <PdfDraw/PdfDraw.h>
 #include <CodeEditor/CodeEditor.h>

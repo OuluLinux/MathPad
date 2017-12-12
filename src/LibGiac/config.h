@@ -233,3 +233,5 @@
 #endif
 
 
+#define GIAC_GENERIC_CONSTANTS 1
+

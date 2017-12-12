@@ -15,24 +15,33 @@ namespace Xcas {
 
 class CasEdit : public ParentCtrl {
 	
-	CasGroup doc;
+protected:
+	friend class Editor;
+	giac::context*	ctx = NULL;
+	CasGroup		doc;
+	ScrollBar		sb;
 	
 	
 public:
 	typedef CasEdit CLASSNAME;
 	CasEdit();
+	~CasEdit();
 	
-	void Print();
-	Editor& NewExpression();
-	CasItem* GetSelectedItem();
+	virtual void	Layout();
+	virtual void	MouseWheel(Point, int zdelta, dword);
+	virtual bool	Key(dword key, int);
 	
-	RichText Get();
-	String GetXml();
-	CasGroup& GetSelectedGroup();
+	void			Print();
+	Editor&			NewExpression();
+	CasItem*		GetSelectedItem();
 	
-	void SetXml(const String& xml);
+	RichText		Get();
+	String			GetXml();
+	CasGroup&		GetSelectedGroup();
 	
-	Callback WhenRefreshBar;
+	void			SetXml(const String& xml);
+	
+	Callback		WhenRefreshBar;
 	
 };
 

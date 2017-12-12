@@ -10,10 +10,14 @@ class Editor : public CasItem {
 	One<GenOutput>	output;
 	Splitter		vsplit;
 	
+	
 public:
 	typedef Editor CLASSNAME;
 	Editor();
 	
+	void Execute();
+	void StartExecute() {Thread::Start(THISBACK(Execute));}
+	void Newline();
 	
 };
 

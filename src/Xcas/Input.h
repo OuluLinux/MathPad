@@ -51,7 +51,9 @@ public:
 	typedef Input CLASSNAME;
 	Input();
 	
+	virtual bool Key(dword key, int count);
 	
+	Callback WhenExecute, WhenNewline;
 };
 
 }

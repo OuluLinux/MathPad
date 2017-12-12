@@ -251,4 +251,17 @@ Input::Input() {
 	
 }
 
+bool Input::Key(dword key, int count) {
+	
+	if (key == K_ENTER) {
+		WhenExecute();
+		return true;
+	}
+	else if (key == K_SHIFT_ENTER) {
+		WhenNewline();
+		return CodeEditor::Key(K_ENTER, count);
+	}
+	return CodeEditor::Key(key, count);
+}
+
 }

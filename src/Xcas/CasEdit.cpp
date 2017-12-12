@@ -3,9 +3,42 @@
 namespace Xcas {
 
 CasEdit::CasEdit() {
-	Add(doc.SizePos());
+	ctx = new giac::context;
+	init_context(ctx);
 	
+	doc.edit = this;
 	
+	Add(doc);
+	AddFrame(sb);
+
+	sb.WhenScroll = [=] { Refresh(); };
+	sb.SetLine(50);
+	
+}
+
+CasEdit::~CasEdit() {
+	cleanup_context(ctx);
+	delete ctx;
+}
+
+void CasEdit::Layout() {
+	doc.RefreshLabel();
+	
+	int page_height = doc.GetContentHeight();
+	Size sz(GetSize());
+	
+	sb.SetPage(sz.cy);
+	sb.SetTotal(page_height);
+	
+	doc.SetRect(0, -sb, sz.cx, page_height);
+}
+
+void CasEdit::MouseWheel(Point, int zdelta, dword) {
+	sb.Wheel(zdelta);
+}
+
+bool CasEdit::Key(dword key, int) {
+	return sb.VertKey(key);
 }
 
 void CasEdit::Print() {
@@ -13,7 +46,9 @@ void CasEdit::Print() {
 }
 
 Editor& CasEdit::NewExpression() {
-	return GetSelectedGroup().Add<Editor>();
+	Editor& e = GetSelectedGroup().Add<Editor>();
+	Layout();
+	return e;
 }
 
 CasItem* CasEdit::GetSelectedItem() {

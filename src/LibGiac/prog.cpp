@@ -6045,6 +6045,13 @@ gen protecteval(const gen & g, int level, GIAC_CONTEXT) {
 		// something went wrong, so restore the old cas_setup
 		cas_setup(cas_setup_save, contextptr);
 	}
+	catch (...) {
+		res = string2gen("Unknown error", false);
+		res.subtype = -1;
+		ctrl_c = false; interrupted = false;
+		// something went wrong, so restore the old cas_setup
+		cas_setup(cas_setup_save, contextptr);
+	}
 #endif
 	return res;
 }
