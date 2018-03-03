@@ -22,7 +22,7 @@ FileSel& PdfFs()
 
 Xcas::Xcas()
 {
-	Title("Xcas Ultimate");
+	Title("MathPad");
 	Icon(XcasImg::icon());
 	Sizeable().MaximizeBox().MinimizeBox();
 	
