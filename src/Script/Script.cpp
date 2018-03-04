@@ -13,6 +13,43 @@ void Node::Swap(Node& n) {
 	Upp::Swap(col,		n.col);
 }
 
+void Node::NodeAsString(String& out, String name, Node* node, int indent, Vector<Node*>* stack) {
+	for(int j = 0; j < stack->GetCount(); j++) {
+		if ((*stack)[j] == node) {
+			node = 0;
+			break;
+		}
+	}
+	if (!node) {
+		out << "\n\t";
+		for(int j = 0; j < indent; j++) out << "\t";
+		out << name << " (recursive)";
+		return;
+	}
+	else {
+		out << "\n" << node->AsString(name, indent+1, stack);
+	}
+}
+
+String Node::AsString(String name, int indent, Vector<Node*>* stack) {
+	bool delete_stack = false;
+	if (stack == 0) {
+		stack = new Vector<Node*>();
+		delete_stack = true;
+	}
+	stack->Add(this);
+	String out;
+	for(int i = 0; i < indent; i++) out.Cat('\t');
+	out << name << ": " << GetNodeHeaderString(kind, int_data, dbl_data, str_data);
+	for(int i = 0; i < nodes.GetCount(); i++)
+		NodeAsString(out, nodes[i].GetKey(), &nodes[i], indent, stack);
+	stack->Remove(stack->GetCount()-1);
+	if (delete_stack) {
+		delete stack;
+	}
+	return out;
+}
+
 
 
 
@@ -28,6 +65,26 @@ void Parser::GetLocation(Node& n) {
 	n.col  = pos.GetColumn();
 }
 
+void Parser::Path(String id) {
+	TopScope() = Ident(id);
+	
+	while (p.IsChar('(') || p.IsChar('.') || p.IsChar('[')) {
+		
+		if (p.IsChar('(')) {
+			Op(OP_METHOD);		FunctionCall(id);		PopScope();
+		}
+		else if (p.Char('.')) {
+			Op(OP_METHOD);		Factor();				PopScope();
+		}
+		else if (p.Char('[')) {
+			Op(OP_METHOD);
+			Base();
+			PopScope();
+			p.Char(']');
+		}
+	}
+}
+
 void Parser::Factor() {
 	if(p.IsId()) {
 		String id = p.ReadId();
@@ -35,53 +92,23 @@ void Parser::Factor() {
 		
 		// Variable
 		if (first_char >= 'a' && first_char <= 'z') {
-			TopScope() = Ident(id);
+			Path(id);
 		}
 		// Class, Function
 		else if (first_char >= 'A' && first_char <= 'Z') {
-			
 			while (p.IsChar(':')) {
 				p.PassChar2(':', ':');
 				id << "::" << p.ReadId();
 			}
-			
-			// Call
-			if(p.IsChar('(')) {
-				FunctionCall(id);
-			}
-			// Function declaring
-			if (p.IsId()) {
-				String id2 = p.ReadId();
-				
-				char first_char2 = id2[0];
-				
-				// Declare variable
-				if (first_char2 >= 'a' && first_char2 <= 'z') {
-					TopScope() = VariableNode(id, id2);
-					if (p.Char('=')) {
-						AddScope();
-						Base();
-						PopScope();
-					}
-					
-					p.PassChar(';');
-				}
-				// Declare Function
-				else if (first_char2 >= 'A' && first_char2 <= 'Z') {
-					ParseFunctionDefinition(id, id2);
-				}
-				
-				else p.ThrowError("Unexpected input");
-			}
-			// Class, Function reference
-			else {
+			if(p.IsChar('('))
+				Path(id);
+			else
 				TopScope() = FunctionRefNode(id);
-			}
 		}
 		else p.ThrowError("Unexpected character");
 	}
 	else if(p.Char('(')) {
-		Expr();
+		Ternary();
 		p.PassChar(')');
 	}
 	else if (p.IsDouble()) {
@@ -108,6 +135,12 @@ void Parser::Unary() {
 		}
 	} else {
 		Factor();
+		
+		for(;;) {
+			if      (p.Char2('+', '+')) {Op(OP_INC);		PopScope();}
+			else if (p.Char2('-', '-')) {Op(OP_DEC);		PopScope();}
+			else return;
+		}
 	}
 }
 
@@ -116,7 +149,7 @@ void Parser::Type() {
 	Unary();
 	if (is_mathmode) {
 		for(;;) {
-			if (p.Char('.')) {Op(OP_TYPE);		Unary();		PopScope();}
+			if (p.Char('\'')) {Op(OP_TYPE);		Unary();		PopScope();}
 			else return;
 		}
 	}
@@ -212,6 +245,18 @@ void Parser::Base() {
 	}
 }
 
+void Parser::CompilationUnit() {
+	PushScope(GetCode().root);
+	
+	while (!p.IsEof()) {
+		AddScope();
+		Statement();
+		PopScope();
+	}
+	
+	PopScope();
+}
+
 void Parser::Block() {
 	TopScope() = BlockNode();
 	
@@ -237,31 +282,26 @@ void Parser::SwitchBlock() {
 	
 	while (!p.IsChar('}')) {
 		
-		String id = p.ReadId();
-		
 		if (p.Id("case")) {
 			AddScope();
 			Term();
 			PopScope();
 			
 			p.PassChar(':');
-			
-			while (!p.IsChar('}')) {
-				AddScope();
-				Statement();
-				PopScope();
-			}
 		}
 		else if (p.Id("default")) {
 			p.PassChar(':');
 			
-			while (!p.IsChar('}')) {
-				AddScope();
-				Statement();
-				PopScope();
-			}
 		}
 		else p.ThrowError("Invalid switch block statement");
+
+		while (!p.IsChar('}')) {
+			AddScope();
+			Statement();
+			PopScope();
+			if (p.IsId("case") || p.IsId("default"))
+				break;
+		}
 	}
 	
 	p.PassChar('}');
@@ -270,9 +310,63 @@ void Parser::SwitchBlock() {
 
 void Parser::Statement() {
 	
+	char first_char = p.PeekChar();
 	
+	if (p.IsChar2('M','{')) {
+		p.Char('M');
+		is_mathmode++;
+		Block();
+		is_mathmode--;
+	}
 	
-	if (p.IsChar('{')) {
+	// Class, Function
+	else if (first_char >= 'A' && first_char <= 'Z') {
+		
+		String id = p.ReadId();
+		
+		while (p.IsChar(':')) {
+			p.PassChar2(':', ':');
+			id << "::" << p.ReadId();
+		}
+		
+		// Call
+		if(p.IsChar('(')) {
+			Path(id);
+		}
+		// Function declaring
+		else if (p.IsId()) {
+			String id2 = p.ReadId();
+			
+			char first_char2 = id2[0];
+			
+			// Declare variable
+			if (first_char2 >= 'a' && first_char2 <= 'z') {
+				for(;;) {
+					TopScope() = VariableNode(id, id2);
+					if (p.Char('=')) {
+						AddScope();
+						Base();
+						PopScope();
+					}
+					if (!p.Char(',')) break;
+					PopScope();
+					AddScope();
+					id2 = p.ReadId();
+				}
+			}
+			// Declare Function
+			else if (first_char2 >= 'A' && first_char2 <= 'Z') {
+				ParseFunctionDefinition(id, id2);
+			}
+			
+			else p.ThrowError("Unexpected input");
+		}
+		// Class, Function reference
+		else {
+			TopScope() = FunctionRefNode(id);
+		}
+	}
+	else if (p.IsChar('{')) {
 		Block();
 	}
 	else if (p.Char(';')) {
@@ -323,6 +417,9 @@ void Parser::Statement() {
 		AddScope();
 		Statement();
 		PopScope();
+		
+		p.PassChar(';');
+		int chr2 = p.PeekChar();
 		
 		AddScope();
 		Base();
@@ -506,6 +603,7 @@ void Parser::ParseFunctionArguments() {
 	
 	while (!p.IsChar(')')) {
 		TopScope().Add() = VariableNode("", p.ReadId());
+		Factor();
 		if (!p.IsChar(')'))
 			p.PassChar(',');
 	}
@@ -516,10 +614,21 @@ void Parser::ParseFunctionArguments() {
 
 CONSOLE_APP_MAIN {
 	
-	/*String script = LoadFile(GetDataFile("test.mo"));
+	String script = LoadFile(GetDataFile("test.oct"));
 	
+	Parser p;
+	p.Set(script);
 	
-	CParser p(script);
+	try {
+		p.CompilationUnit();
+		GetCode().Dump();
+	}
+	catch (Exc e) {
+		GetCode().Dump();
+		LOG("Exception: " << e);
+	}
+	
+	/*CParser p(script);
 	try {
 		String id;
 		if(p.IsId()) {

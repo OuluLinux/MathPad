@@ -1,3 +1,5 @@
+
+
 Int i = -123;
 Double d = 123.456;
 String s = "hello";
@@ -6,7 +8,7 @@ namespace Test::Something {}
 Print(s, " world");
 Void DumbFn(String arg1, Int arg2) {}
 class MathClass {
-	String GetValue(int, int) {return " world";}
+	String GetValue(Int a, Int b) {return " world";}
 };
 MathClass m0, m1, m2;
 
@@ -26,26 +28,28 @@ test7 = 123 + 456;
 }}}}
 Int test9;
 switch (3) {
-	case 1: test9 = 10; break;
+ 	case 1: test9 = 10; break;
 	case 3: test9 = 1; break;
 	default: test9 = 5; break;
 }
 if (true) {} else {}
 if (true) {} else if (true) {} else if (true) {} else {}
 while (true) {}
-for (int i=0; i < 10; i++) {continue; break; return 0;}
+for (Int i=0; i < 10; i++) {continue; break; return 0;}
 try {} catch (Exc e) {}
 try {}
 
 Print(s + m0.GetValue(1,2));
 
 M{
-	abc = 123.kg + 456.kg
+	Gen value = SomeFn(2 + 3, ((5*2)) ) * 54;
+
+	Gen abc = 123'kg + 456'kg;
 	
-	somefn(arg0, arg1) {
-		arg0 = (1.(m/s**2) + 2.(m/s**2)) * (3 - 4) / 5**2 == 123;
+	Gen SomeFn(Gen arg0, Gen arg1) {
+		Gen arg0 = (1'(m/s**2) + 2'(m/s**2)) * (3 - 4) / 5**2 == 123;
 		return 0;
-	}
+	};
 	
-	value = somefn(2 + 3, ((5*2)) ) * 54
+	Gen value = SomeFn(2 + 3, ((5*2)) ) * 54;
 }
