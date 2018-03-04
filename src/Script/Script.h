@@ -28,6 +28,7 @@ enum {
 	BREAK,
 	USING,
 	NAMESPACE,
+	TRY,
 };
 
 enum {
@@ -118,6 +119,7 @@ inline String GetNodeHeaderString(int kind, const int& int_data, const double& d
 		case BREAK: return "Break";
 		case USING: return "Using (" + (str_data) + ")";
 		case NAMESPACE: return "Namespace (" + (str_data) + ")";
+		case TRY: return "Try";
 		case OP_METHOD: return "Method (" + (str_data) + ")";
 		default: return "<no kind string set>";
 	}
@@ -198,7 +200,7 @@ public:
 	void GetLocation(Node& n);
 	void Path(String id);
 	
-	inline Node BlockNode() {Node n(BLOCK); GetLocation(n); return n;}
+	inline Node BlockNode(bool math) {Node n(BLOCK, (int)math); GetLocation(n); return n;}
 	inline Node SwitchBlockNode() {Node n(SWITCHBLOCK); GetLocation(n); return n;}
 	inline Node SwitchNode() {Node n(SWITCH); GetLocation(n); return n;}
 	inline Node IfNode() {Node n(IF); GetLocation(n); return n;}
@@ -209,6 +211,7 @@ public:
 	inline Node BreakNode() {Node n(BREAK); GetLocation(n); return n;}
 	inline Node UsingNode() {Node n(USING); GetLocation(n); return n;}
 	inline Node NamespaceNode() {Node n(NAMESPACE); GetLocation(n); return n;}
+	inline Node TryNode() {Node n(TRY); GetLocation(n); return n;}
 	inline Node IntLiteral(int i) {Node n(INTLITERAL, i); GetLocation(n); return n;}
 	inline Node DoubleLiteral(double d) {Node n(DOUBLELITEREAL, d); GetLocation(n); return n;}
 	inline Node StringLiteral(String s) {Node n(STRINGLITERAL, s); GetLocation(n); return n;}
@@ -232,7 +235,7 @@ public:
 	void Ternary();
 	void Base();
 	void CompilationUnit();
-	void Block();
+	void Block(bool math=false);
 	void SwitchBlock();
 	void Statement();
 	void CheckLegalBreak();

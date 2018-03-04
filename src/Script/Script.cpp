@@ -67,11 +67,12 @@ void Parser::GetLocation(Node& n) {
 
 void Parser::Path(String id) {
 	TopScope() = Ident(id);
-	
+	bool first = true;
 	while (p.IsChar('(') || p.IsChar('.') || p.IsChar('[')) {
 		
 		if (p.IsChar('(')) {
-			Op(OP_METHOD);		FunctionCall(id);		PopScope();
+			if (first)		FunctionCall(id);
+			else			{Op(OP_METHOD);		FunctionCall(id);		 PopScope();}
 		}
 		else if (p.Char('.')) {
 			Op(OP_METHOD);		Factor();				PopScope();
@@ -82,6 +83,8 @@ void Parser::Path(String id) {
 			PopScope();
 			p.Char(']');
 		}
+		
+		first = false;
 	}
 }
 
@@ -257,8 +260,8 @@ void Parser::CompilationUnit() {
 	PopScope();
 }
 
-void Parser::Block() {
-	TopScope() = BlockNode();
+void Parser::Block(bool math) {
+	TopScope() = BlockNode(math);
 	
 	p.Char('{');
 	
@@ -315,7 +318,7 @@ void Parser::Statement() {
 	if (p.IsChar2('M','{')) {
 		p.Char('M');
 		is_mathmode++;
-		Block();
+		Block(true);
 		is_mathmode--;
 	}
 	
@@ -353,6 +356,7 @@ void Parser::Statement() {
 					AddScope();
 					id2 = p.ReadId();
 				}
+				p.Char(';');
 			}
 			// Declare Function
 			else if (first_char2 >= 'A' && first_char2 <= 'Z') {
@@ -373,7 +377,7 @@ void Parser::Statement() {
 		
 	}
 	else if (p.Id("if")) {
-		AddScope() = IfNode();
+		TopScope() = IfNode();
 		
 		p.PassChar('(');
 		AddScope();
@@ -396,7 +400,7 @@ void Parser::Statement() {
 		}
 	}
 	else if (p.Id("while")) {
-		AddScope() = WhileNode();
+		TopScope() = WhileNode();
 		
 		p.PassChar('(');
 		AddScope();
@@ -411,15 +415,12 @@ void Parser::Statement() {
 		PopScope();
 	}
 	else if (p.Id("for")) {
-		AddScope() = ForNode();
+		TopScope() = ForNode();
 		
 		p.PassChar('(');
 		AddScope();
 		Statement();
 		PopScope();
-		
-		p.PassChar(';');
-		int chr2 = p.PeekChar();
 		
 		AddScope();
 		Base();
@@ -440,7 +441,7 @@ void Parser::Statement() {
 		PopScope();
 	}
 	else if (p.Id("switch")) {
-		AddScope() = SwitchNode();
+		TopScope() = SwitchNode();
 		
 		p.PassChar('(');
 		AddScope();
@@ -455,7 +456,7 @@ void Parser::Statement() {
 		PopScope();
 	}
 	else if (p.Id("return")) {
-		AddScope() = ReturnNode();
+		TopScope() = ReturnNode();
 		
 		if (!p.IsChar(';')) {
 			AddScope();
@@ -471,7 +472,7 @@ void Parser::Statement() {
 		ParseTryDefinition();
 	}
 	else if (p.Id("break")) {
-		AddScope() = BreakNode();
+		TopScope() = BreakNode();
 		
 		p.PassChar(';');
 		
@@ -483,20 +484,18 @@ void Parser::Statement() {
         CheckLegalBreak();
 	}
 	else if (p.Id("using")) {
-		AddScope() = UsingNode();
+		TopScope() = UsingNode();
 		AddScope();
 		Base();
 		PopScope();
-		PopScope();
 	}
 	else if (p.Id("namespace")) {
-		AddScope() = NamespaceNode();
+		TopScope() = NamespaceNode();
 		AddScope();
 		Base();
 		PopScope();
 		AddScope();
 		Block();
-		PopScope();
 		PopScope();
 		
 	}
@@ -539,19 +538,18 @@ void Parser::Op(int i) {
 void Parser::ParseFunctionDefinition(String ret_type, String func_name) {
 	TopScope() = FunctionNode(func_name);
 	
-	AddScope();
 	ParseFunctionArguments();
 	
 	AddScope();
 	Block();
 	PopScope();
 	
-	PopScope();
 }
 
 void Parser::ParseTryDefinition() {
 	p.PassId("try");
-	AddScope();
+	TopScope() = TryNode();
+	
 	AddScope();
 	Statement();
 	PopScope();
@@ -582,8 +580,6 @@ void Parser::FunctionCall(String func_name) {
 	
 	p.PassChar('(');
 	
-	AddScope();
-	
 	if (!p.Char(')')) {
 		do {
 			AddScope();
@@ -594,18 +590,19 @@ void Parser::FunctionCall(String func_name) {
 	}
 	
 	p.PassChar(')');
-	
-	PopScope();
 }
 
 void Parser::ParseFunctionArguments() {
 	p.PassChar('(');
 	
 	while (!p.IsChar(')')) {
-		TopScope().Add() = VariableNode("", p.ReadId());
-		Factor();
+		AddScope();
+		String type = p.ReadId();
+		String id = p.ReadId();
+		TopScope() = VariableNode(type, id);
 		if (!p.IsChar(')'))
 			p.PassChar(',');
+		PopScope();
 	}
 	
 	p.PassChar(')');
