@@ -40,7 +40,7 @@ String Node::AsString(String name, int indent, Vector<Node*>* stack) {
 	stack->Add(this);
 	String out;
 	for(int i = 0; i < indent; i++) out.Cat('\t');
-	out << name << ": " << GetNodeHeaderString(kind, int_data, dbl_data, str_data);
+	out << name << ": " << GetNodeHeaderString(kind, name, int_data, dbl_data, str_data);
 	for(int i = 0; i < nodes.GetCount(); i++)
 		NodeAsString(out, nodes[i].GetKey(), &nodes[i], indent, stack);
 	stack->Remove(stack->GetCount()-1);
@@ -151,10 +151,19 @@ String Node::ToCode(int indent) {
 			case OP_METHOD:
 				s << "(" << nodes[0].ToCode() << "." << nodes[1].ToCode() << ")";
 				break;
+			case OP_GETA:
+				s << "&" << nodes[1].ToCode();
+				break;
+			case OP_GETV:
+				s << "*" << nodes[1].ToCode();
+				break;
 		}
 	}
 	else if (kind == VARIABLE) {
-		s << str_data << " " << name;
+		s << str_data;
+		if (int_data & (1 << 1)) s << "*";
+		if (int_data & (1 << 0)) s << "&";
+		s << " " << name;
 		if (nodes.GetCount())
 			s << " = " << nodes[0].ToCode();
 	}
@@ -360,9 +369,11 @@ void Parser::Factor() {
 
 void Parser::Unary() {
 	Node& a = TopScope();
-	if (p.IsChar('!')) {
+	if (p.IsChar('!') || p.IsChar('*') || p.IsChar('&')) {
 		for(;;) {
-			if (p.Char('!')) {Op(OP_UNOT);		Factor();		PopScope();}
+			if      (p.Char('!')) {Op(OP_UNOT);		Factor();		PopScope();}
+			else if (p.Char('*')) {Op(OP_GETV);		Factor();		PopScope();}
+			else if (p.Char('&')) {Op(OP_GETA);		Factor();		PopScope();}
 			else return;
 		}
 	} else {
@@ -566,6 +577,10 @@ void Parser::Statement() {
 			id << "::" << p.ReadId();
 		}
 		
+		bool is_ptr = p.Char('*');
+		bool is_ref = p.Char('&');
+		int flag = (is_ptr << 1) | (is_ref << 0);
+		
 		// Call
 		if(p.IsChar('(')) {
 			Path(id);
@@ -579,7 +594,7 @@ void Parser::Statement() {
 			// Declare variable
 			if (first_char2 >= 'a' && first_char2 <= 'z') {
 				for(;;) {
-					TopScope() = VariableNode(id, id2);
+					TopScope() = VariableNode(id, id2, flag);
 					if (p.Char('=')) {
 						AddScope();
 						Base();
@@ -839,8 +854,13 @@ void Parser::ParseFunctionArguments() {
 	while (!p.IsChar(')')) {
 		AddScope();
 		String type = p.ReadId();
+		
+		bool is_ptr = p.Char('*');
+		bool is_ref = p.Char('&');
+		int flag = (is_ptr << 1) | (is_ref << 0);
+		
 		String id = p.ReadId();
-		TopScope() = VariableNode(type, id);
+		TopScope() = VariableNode(type, id, flag);
 		if (!p.IsChar(')'))
 			p.PassChar(',');
 		PopScope();

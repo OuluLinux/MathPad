@@ -64,6 +64,8 @@ enum {
 	OP_ASSIGN,
 	OP_INLINECOND,
 	OP_METHOD,
+	OP_GETV,
+	OP_GETA,
 };
 
 inline String GetOpString(int op) {
@@ -96,19 +98,21 @@ inline String GetOpString(int op) {
 		case OP_ASSIGN: return "=";
 		case OP_INLINECOND: return "?:";
 		case OP_METHOD: return ".";
+		case OP_GETV: return "*";
+		case OP_GETA: return "&";
 	}
 	return "Unknown";
 }
-inline String GetNodeHeaderString(int kind, const int& int_data, const double& dbl_data, const String& str_data) {
+inline String GetNodeHeaderString(int kind, const String& name, const int& int_data, const double& dbl_data, const String& str_data) {
 	switch (kind) {
 		case UNKNOWN: return "Unknown";
 		case COMPILATIONUNIT: return "Compilation unit";
-		case ID: return "Ident (" + (str_data) + ")";
+		case ID: return "Ident (" + (name) + ")";
 		case OP: return "Op (" + GetOpString(int_data) + ")";
-		case VARIABLE: return "Variable (" + (str_data) + ")";
+		case VARIABLE: return "Variable (" + (str_data + " " + name) + ") " + ((int_data & (1 << 1)) ? "* " : " ") + ((int_data & (1 << 0)) ? "& " : " ");
 		case FUNCREF: return "Function reference (" + (str_data) + ")";
-		case FUNC: return "Function (" + (str_data) + ")";
-		case CLASS: return "Class (" + (str_data) + ")";
+		case FUNC: return "Function (" + (str_data + " " + name) + ")";
+		case CLASS: return "Class (" + (name) + ")";
 		case CALL: return "Call (" + (str_data) + ")";
 		case INTLITERAL: return "Int literal (" + IntStr(int_data) + ")";
 		case DOUBLELITEREAL: return "Double literal (" + DblStr(dbl_data) + ")";
@@ -165,6 +169,7 @@ public:
 	int GetKind() const {return kind;}
 	String GetKey() const {return name;}
 	
+	void SetInt(int i) {int_data = i;}
 	void Swap(Node& n);
 	void Clear() {nodes.Clear(); name=""; str_data=""; dbl_data=0; int_data=0; kind=0; line=-1; col=-1;}
 	
@@ -233,7 +238,7 @@ public:
 	inline Node FunctionNode(String type, String name) {Node n(FUNC, name, type); GetLocation(n); return n;}
 	inline Node CallNode(String id) {Node n(CALL, id); GetLocation(n); return n;}
 	inline Node ClassNode(String id) {Node n(CLASS, id, ""); GetLocation(n); return n;}
-	inline Node VariableNode(String type, String name) {Node n(VARIABLE, name, type); GetLocation(n); return n;}
+	inline Node VariableNode(String type, String name, int flag) {Node n(VARIABLE, name, type); n.SetInt(flag); GetLocation(n); return n;}
 	
 	void Set(const String& s) {p.Set(s);}
 	void Factor();

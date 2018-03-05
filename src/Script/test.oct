@@ -1,6 +1,8 @@
-
-
 Int i = -123;
+Int* ptr = &i;
+Int& ref = i;
+i = *ptr;
+
 Double d = 123.456;
 String s = "hello";
 using namespace System::IO;
