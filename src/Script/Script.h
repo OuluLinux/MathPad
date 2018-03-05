@@ -7,6 +7,7 @@ using namespace Upp;
 
 enum {
 	UNKNOWN,
+	COMPILATIONUNIT,
 	ID,
 	OP,
 	VARIABLE,
@@ -29,6 +30,9 @@ enum {
 	USING,
 	NAMESPACE,
 	TRY,
+	CATCH,
+	CASE,
+	DEFAULT
 };
 
 enum {
@@ -36,7 +40,7 @@ enum {
 	OP_INC,
 	OP_DEC,
 	OP_TYPE,
-	OP_EXP,
+	OP_POW,
 	OP_MUL,
 	OP_DIV,
 	OP_MOD,
@@ -68,7 +72,7 @@ inline String GetOpString(int op) {
 		case OP_INC: return "++";
 		case OP_DEC: return "--";
 		case OP_TYPE: return "M type";
-		case OP_EXP: return "M pow";
+		case OP_POW: return "M pow";
 		case OP_MUL: return "*";
 		case OP_DIV: return "/";
 		case OP_MOD: return "%";
@@ -98,6 +102,7 @@ inline String GetOpString(int op) {
 inline String GetNodeHeaderString(int kind, const int& int_data, const double& dbl_data, const String& str_data) {
 	switch (kind) {
 		case UNKNOWN: return "Unknown";
+		case COMPILATIONUNIT: return "Compilation unit";
 		case ID: return "Ident (" + (str_data) + ")";
 		case OP: return "Op (" + GetOpString(int_data) + ")";
 		case VARIABLE: return "Variable (" + (str_data) + ")";
@@ -120,7 +125,9 @@ inline String GetNodeHeaderString(int kind, const int& int_data, const double& d
 		case USING: return "Using (" + (str_data) + ")";
 		case NAMESPACE: return "Namespace (" + (str_data) + ")";
 		case TRY: return "Try";
-		case OP_METHOD: return "Method (" + (str_data) + ")";
+		case CATCH: return "Catch";
+		case CASE: return "Case";
+		case DEFAULT: return "Default";
 		default: return "<no kind string set>";
 	}
 	return "Unknown";
@@ -159,9 +166,11 @@ public:
 	String GetKey() const {return name;}
 	
 	void Swap(Node& n);
+	void Clear() {nodes.Clear(); name=""; str_data=""; dbl_data=0; int_data=0; kind=0; line=-1; col=-1;}
 	
 	void NodeAsString(String& out, String name, Node* node, int indent=0, Vector<Node*>* stack=0);
 	String AsString(String name="", int indent=0, Vector<Node*>* stack=0);
+	String ToCode(int indent=0);
 };
 
 
@@ -176,7 +185,7 @@ public:
 	typedef Code CLASSNAME;
 	Code() {}
 	
-	
+	Node& GetPortal() {return root;}
 	void Dump() {LOG(root.AsString());}
 };
 
@@ -201,6 +210,7 @@ public:
 	void Path(String id);
 	
 	inline Node BlockNode(bool math) {Node n(BLOCK, (int)math); GetLocation(n); return n;}
+	inline Node CompilationUnitNode() {Node n(COMPILATIONUNIT); GetLocation(n); return n;}
 	inline Node SwitchBlockNode() {Node n(SWITCHBLOCK); GetLocation(n); return n;}
 	inline Node SwitchNode() {Node n(SWITCH); GetLocation(n); return n;}
 	inline Node IfNode() {Node n(IF); GetLocation(n); return n;}
@@ -212,14 +222,17 @@ public:
 	inline Node UsingNode() {Node n(USING); GetLocation(n); return n;}
 	inline Node NamespaceNode() {Node n(NAMESPACE); GetLocation(n); return n;}
 	inline Node TryNode() {Node n(TRY); GetLocation(n); return n;}
+	inline Node CatchNode() {Node n(CATCH); GetLocation(n); return n;}
+	inline Node CaseNode() {Node n(CASE); GetLocation(n); return n;}
+	inline Node DefaultNode() {Node n(DEFAULT); GetLocation(n); return n;}
 	inline Node IntLiteral(int i) {Node n(INTLITERAL, i); GetLocation(n); return n;}
 	inline Node DoubleLiteral(double d) {Node n(DOUBLELITEREAL, d); GetLocation(n); return n;}
 	inline Node StringLiteral(String s) {Node n(STRINGLITERAL, s); GetLocation(n); return n;}
-	inline Node Ident(String id) {Node n(ID, id); GetLocation(n); return n;}
+	inline Node Ident(String id) {Node n(ID, id, ""); GetLocation(n); return n;}
 	inline Node FunctionRefNode(String id) {Node n(FUNCREF, id); GetLocation(n); return n;}
-	inline Node FunctionNode(String id) {Node n(FUNC, id); GetLocation(n); return n;}
+	inline Node FunctionNode(String type, String name) {Node n(FUNC, name, type); GetLocation(n); return n;}
 	inline Node CallNode(String id) {Node n(CALL, id); GetLocation(n); return n;}
-	inline Node ClassNode(String id) {Node n(CLASS, id); GetLocation(n); return n;}
+	inline Node ClassNode(String id) {Node n(CLASS, id, ""); GetLocation(n); return n;}
 	inline Node VariableNode(String type, String name) {Node n(VARIABLE, name, type); GetLocation(n); return n;}
 	
 	void Set(const String& s) {p.Set(s);}

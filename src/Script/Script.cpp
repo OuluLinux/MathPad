@@ -50,6 +50,235 @@ String Node::AsString(String name, int indent, Vector<Node*>* stack) {
 	return out;
 }
 
+String Node::ToCode(int indent) {
+	String s;
+	//s.Cat('\t', indent);
+	
+	if (kind==COMPILATIONUNIT) {
+		for(int i = 0; i < nodes.GetCount(); i++) {
+			s << nodes[i].ToCode(indent);
+			char last = s.GetCount() ? *(s.End()-1) : 0;
+			if (last != '\n' && last != ';')
+				s << ";\n";
+		}
+	}
+	else if (kind == ID) {
+		s << name;
+	}
+	else if (kind == OP) {
+		switch (int_data) {
+			case OP_UNOT:
+				s << "!" << nodes[1].ToCode();
+				break;
+			case OP_INC:
+				s << nodes[0].ToCode() << "++";
+				break;
+			case OP_DEC:
+				s << nodes[0].ToCode() << "--";
+				break;
+			case OP_TYPE:
+				s << "(" << nodes[0].ToCode() << "'" << nodes[1].ToCode() << ")";
+				break;
+			case OP_POW:
+				s << "(" << nodes[0].ToCode() << "**" << nodes[1].ToCode() << ")";
+				break;
+			case OP_MUL:
+				s << "(" << nodes[0].ToCode() << "*" << nodes[1].ToCode() << ")";
+				break;
+			case OP_DIV:
+				s << "(" << nodes[0].ToCode() << "/" << nodes[1].ToCode() << ")";
+				break;
+			case OP_MOD:
+				s << "(" << nodes[0].ToCode() << "%" << nodes[1].ToCode() << ")";
+				break;
+			case OP_ADD:
+				s << "(" << nodes[0].ToCode() << "+" << nodes[1].ToCode() << ")";
+				break;
+			case OP_SUB:
+				s << "(" << nodes[0].ToCode() << "-" << nodes[1].ToCode() << ")";
+				break;
+			case OP_LSHIFT:
+				s << "(" << nodes[0].ToCode() << "<<" << nodes[1].ToCode() << ")";
+				break;
+			case OP_RSHIFT:
+				s << "(" << nodes[0].ToCode() << ">>" << nodes[1].ToCode() << ")";
+				break;
+			case OP_EQUAL:
+				s << "(" << nodes[0].ToCode() << "==" << nodes[1].ToCode() << ")";
+				break;
+			case OP_NEQUAL:
+				s << "(" << nodes[0].ToCode() << "!=" << nodes[1].ToCode() << ")";
+				break;
+			case OP_LEQUAL:
+				s << "(" << nodes[0].ToCode() << "<=" << nodes[1].ToCode() << ")";
+				break;
+			case OP_GEQUAL:
+				s << "(" << nodes[0].ToCode() << ">=" << nodes[1].ToCode() << ")";
+				break;
+			case OP_LESS:
+				s << "(" << nodes[0].ToCode() << "<" << nodes[1].ToCode() << ")";
+				break;
+			case OP_GREATER:
+				s << "(" << nodes[0].ToCode() << ">" << nodes[1].ToCode() << ")";
+				break;
+			case OP_AND:
+				s << "(" << nodes[0].ToCode() << "&" << nodes[1].ToCode() << ")";
+				break;
+			case OP_OR:
+				s << "(" << nodes[0].ToCode() << "|" << nodes[1].ToCode() << ")";
+				break;
+			case OP_XOR:
+				s << "(" << nodes[0].ToCode() << "^" << nodes[1].ToCode() << ")";
+				break;
+			case OP_ANDAND:
+				s << "(" << nodes[0].ToCode() << "&&" << nodes[1].ToCode() << ")";
+				break;
+			case OP_OROR:
+				s << "(" << nodes[0].ToCode() << "||" << nodes[1].ToCode() << ")";
+				break;
+			case OP_PLUSEQUAL:
+				s << nodes[0].ToCode() << "+=" << nodes[1].ToCode();
+				break;
+			case OP_MINUSEQUAL:
+				s << nodes[0].ToCode() << "-=" << nodes[1].ToCode();
+				break;
+			case OP_ASSIGN:
+				s << nodes[0].ToCode() << "=" << nodes[1].ToCode();
+				break;
+			case OP_INLINECOND:
+				s << "(" << nodes[0].ToCode() << "?" << nodes[1].ToCode() << ":" << nodes[2].ToCode() << ")";
+				break;
+			case OP_METHOD:
+				s << "(" << nodes[0].ToCode() << "." << nodes[1].ToCode() << ")";
+				break;
+		}
+	}
+	else if (kind == VARIABLE) {
+		s << str_data << " " << name;
+		if (nodes.GetCount())
+			s << " = " << nodes[0].ToCode();
+	}
+	else if (kind == FUNCREF) {
+		s << str_data;
+	}
+	else if (kind == FUNC) {
+		s << str_data << " " << name << "(";
+		for(int i = 0; i < nodes.GetCount()-1; i++) {
+			if (i) s << ", ";
+			s << nodes[i].ToCode();
+		}
+		s << ")\n";
+		s.Cat('\t', indent);
+		s << nodes.Top().ToCode(indent);
+	}
+	else if (kind == CLASS) {
+		s << "class " << name << "\n";
+		s.Cat('\t', indent);
+		s << nodes.Top().ToCode(indent);
+	}
+	else if (kind == CALL) {
+		s << str_data << "(";
+		for(int i = 0; i < nodes.GetCount(); i++) {
+			if (i) s << ", ";
+			s << nodes[i].ToCode();
+		}
+		s << ")";
+	}
+	else if (kind == INTLITERAL) {
+		s << int_data;
+	}
+	else if (kind == DOUBLELITEREAL) {
+		s << dbl_data;
+	}
+	else if (kind == STRINGLITERAL) {
+		s << "\"" << str_data << "\"";
+	}
+	else if (kind == BLOCK || kind == SWITCHBLOCK) {
+		if (int_data)
+			s << "M";
+		s << "{\n";
+		for(int i = 0; i < nodes.GetCount(); i++) {
+			s.Cat('\t', indent + 1);
+			s << nodes[i].ToCode(indent + 1);
+			char last = s.GetCount() ? *(s.End()-1) : 0;
+			if (last != '\n' && last != ';')
+				s << ";\n";
+		}
+		s.Cat('\t', indent);
+		s << "}\n";
+	}
+	else if (kind == SWITCH) {
+		s << "switch (" << nodes[0].ToCode() << ")\n";
+		s.Cat('\t', indent);
+		s << nodes.Top().ToCode(indent);
+	}
+	else if (kind == IF) {
+		s << "if (" << nodes[0].ToCode() << ") ";
+		s << nodes[1].ToCode(indent);
+		if (nodes.GetCount() > 2) {
+			s.Cat('\t', indent);
+			s << "else " << nodes[2].ToCode(indent);
+		}
+	}
+	else if (kind == SCOPE) {
+		s << nodes.Top().ToCode(indent);
+	}
+	else if (kind == WHILE) {
+		s << "while (" << nodes[0].ToCode() << ") ";
+		s << nodes.Top().ToCode(indent);
+	}
+	else if (kind == FOR) {
+		s << "for (" << nodes[0].ToCode() << ";" << nodes[1].ToCode() << ";" << nodes[2].ToCode() << ") ";
+		s << nodes.Top().ToCode(indent);
+	}
+	else if (kind == RETURN) {
+		s << "return";
+		if (nodes.GetCount())
+			s << " " << nodes.Top().ToCode(indent);
+	}
+	else if (kind == BREAK) {
+		s << "break";
+	}
+	else if (kind == USING) {
+		s << "using ";
+		s << nodes[0].ToCode();
+	}
+	else if (kind == NAMESPACE) {
+		s << "namespace ";
+		s << nodes[0].ToCode();;
+		if (nodes.GetCount() > 1)
+			s << "\n" << nodes[1].ToCode(indent);
+	}
+	else if (kind == TRY) {
+		s << "try\n" << nodes[0].ToCode();
+		if (nodes.GetCount() > 1) {
+			s << nodes[1].ToCode(indent);
+		}
+	}
+	else if (kind == CATCH) {
+		s << "catch (" << nodes[0].ToCode() << ") ";
+		if (nodes.GetCount() > 1) {
+			s << nodes[1].ToCode(indent);
+		}
+	}
+	else if (kind == CASE) {
+		s << "case " << nodes[0].ToCode() << ":\n";
+		if (nodes.GetCount() > 1) {
+			s.Cat('\t', indent);
+			s << nodes[1].ToCode(indent);
+		}
+	}
+	else if (kind == DEFAULT) {
+		s << "default:\n";
+		if (nodes.GetCount() > 0) {
+			s.Cat('\t', indent);
+			s << nodes.Top().ToCode(indent);
+		}
+	}
+	
+	return s;
+}
+
 
 
 
@@ -111,7 +340,7 @@ void Parser::Factor() {
 		else p.ThrowError("Unexpected character");
 	}
 	else if(p.Char('(')) {
-		Ternary();
+		Base();
 		p.PassChar(')');
 	}
 	else if (p.IsDouble()) {
@@ -163,7 +392,7 @@ void Parser::Expo() {
 	Type();
 	if (is_mathmode) {
 		for(;;) {
-			if (p.Char2('*', '*')) {Op(OP_EXP);		Type();		PopScope();}
+			if (p.Char2('*', '*')) {Op(OP_POW);		Type();		PopScope();}
 			else return;
 		}
 	}
@@ -182,8 +411,8 @@ void Parser::Term() {
 void Parser::Expr() {
 	Term();
 	for(;;) {
-		if      (p.Char('+')) {Op(OP_ADD);		Term();		PopScope();}
-		else if (p.Char('-')) {Op(OP_SUB);		Term();		PopScope();}
+		if      (!p.IsChar2('+','=') && p.Char('+')) {Op(OP_ADD);		Term();		PopScope();}
+		else if (!p.IsChar2('-','=') && p.Char('-')) {Op(OP_SUB);		Term();		PopScope();}
 		else return;
 	}
 }
@@ -213,11 +442,12 @@ void Parser::Condition() {
 void Parser::Logic() {
 	Condition();
 	for(;;) {
-		if      (p.Char('&'))       {Op(OP_AND);		Condition();	PopScope();}
+		
+		if      (p.Char2('&', '&')) {Op(OP_ANDAND);		Condition();	PopScope();}
+		else if (p.Char2('|', '|')) {Op(OP_OROR);		Condition();	PopScope();}
+		else if (p.Char('&'))       {Op(OP_AND);		Condition();	PopScope();}
 		else if (p.Char('|'))       {Op(OP_OR);			Condition();	PopScope();}
 		else if (p.Char('^'))       {Op(OP_XOR);		Condition();	PopScope();}
-		else if (p.Char2('&', '&')) {Op(OP_ANDAND);		Condition();	PopScope();}
-		else if (p.Char2('|', '|')) {Op(OP_OROR);		Condition();	PopScope();}
 		else return;
 	}
 }
@@ -250,6 +480,7 @@ void Parser::Base() {
 
 void Parser::CompilationUnit() {
 	PushScope(GetCode().root);
+	TopScope() = CompilationUnitNode();
 	
 	while (!p.IsEof()) {
 		AddScope();
@@ -286,15 +517,18 @@ void Parser::SwitchBlock() {
 	while (!p.IsChar('}')) {
 		
 		if (p.Id("case")) {
+			AddScope() = CaseNode();
 			AddScope();
 			Term();
+			PopScope();
 			PopScope();
 			
 			p.PassChar(':');
 		}
 		else if (p.Id("default")) {
 			p.PassChar(':');
-			
+			AddScope() = DefaultNode();
+			PopScope();
 		}
 		else p.ThrowError("Invalid switch block statement");
 
@@ -485,9 +719,12 @@ void Parser::Statement() {
 	}
 	else if (p.Id("using")) {
 		TopScope() = UsingNode();
+		bool is_namespace = p.Id("namespace");
+		if (is_namespace) AddScope() = NamespaceNode();
 		AddScope();
 		Base();
 		PopScope();
+		if (is_namespace) PopScope();
 	}
 	else if (p.Id("namespace")) {
 		TopScope() = NamespaceNode();
@@ -502,6 +739,10 @@ void Parser::Statement() {
 	else if (p.IsId() || p.IsInt() || p.IsDouble() || p.IsString() || p.IsChar('-')) {
 		Base();
 		p.PassChar(';');
+	}
+	else if(p.Char('(')) {
+		Base();
+		p.Char(')');
 	}
 	else if (!p.IsEof())
 		p.ThrowError("Unexpected input");
@@ -536,7 +777,7 @@ void Parser::Op(int i) {
 }
 
 void Parser::ParseFunctionDefinition(String ret_type, String func_name) {
-	TopScope() = FunctionNode(func_name);
+	TopScope() = FunctionNode(ret_type, func_name);
 	
 	ParseFunctionArguments();
 	
@@ -555,7 +796,7 @@ void Parser::ParseTryDefinition() {
 	PopScope();
 	
 	if (p.Id("catch")) {
-		AddScope();
+		AddScope() = CatchNode();
 		ParseFunctionArguments();
 		AddScope();
 		Statement();
@@ -610,15 +851,41 @@ void Parser::ParseFunctionArguments() {
 
 
 CONSOLE_APP_MAIN {
+	Code& code = GetCode();
 	
 	String script = LoadFile(GetDataFile("test.oct"));
 	
-	Parser p;
-	p.Set(script);
+	Parser p1;
+	p1.Set(script);
 	
 	try {
-		p.CompilationUnit();
-		GetCode().Dump();
+		p1.CompilationUnit();
+		code.Dump();
+		String code1 = code.GetPortal().ToCode();
+		LOG(code1);
+		
+		code.GetPortal().Clear();
+		Parser p2;
+		p2.Set(code1);
+		p2.CompilationUnit();
+		String code2 = code.GetPortal().ToCode();
+		
+		int count = min(code2.GetLength(), code1.GetLength());
+		int line = 0, col = 0;
+		for(int i = 0; i < count; i++) {
+			char chr1 = code1[i];
+			char chr2 = code2[i];
+			
+			if (chr1 != chr2) {
+				LOG("ERROR AT " << line << ":" << col);
+				break;
+			}
+			col++;
+			if (chr1 == '\n') {
+				line++;
+				col = 0;
+			}
+		}
 	}
 	catch (Exc e) {
 		GetCode().Dump();
