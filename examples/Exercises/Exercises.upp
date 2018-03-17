@@ -3,7 +3,7 @@ uses
 	MathCtrl;
 
 file
-	UniExercises.h,
+	Exercises.h,
 	main.cpp;
 
 mainconfig

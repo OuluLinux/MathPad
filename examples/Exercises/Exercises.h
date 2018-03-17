@@ -1,5 +1,5 @@
-#ifndef _UniExercises_UniExercises_h
-#define _UniExercises_UniExercises_h
+#ifndef _Exercises_Exercises_h
+#define _Exercises_Exercises_h
 
 #include <CtrlLib/CtrlLib.h>
 #include <MathCtrl/MathCtrl.h>
@@ -7,11 +7,11 @@ using namespace Upp;
 using namespace MathCore;
 using namespace MathCtrl;
 
-class UniExercises : public TopWindow {
+class Exercises : public TopWindow {
 	
 public:
-	typedef UniExercises CLASSNAME;
-	UniExercises();
+	typedef Exercises CLASSNAME;
+	Exercises();
 	
 	::MathCtrl::MathCtrl mc;
 	
