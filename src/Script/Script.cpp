@@ -159,19 +159,8 @@ String Node::ToCode(int indent) {
 				break;
 		}
 	}
-	else if (kind == VARIABLE) {
-		s << str_data;
-		if (int_data & (1 << 1)) s << "*";
-		if (int_data & (1 << 0)) s << "&";
-		s << " " << name;
-		if (nodes.GetCount())
-			s << " = " << nodes[0].ToCode();
-	}
-	else if (kind == FUNCREF) {
-		s << str_data;
-	}
 	else if (kind == FUNC) {
-		s << str_data << " " << name << "(";
+		s << name << "(";
 		for(int i = 0; i < nodes.GetCount()-1; i++) {
 			if (i) s << ", ";
 			s << nodes[i].ToCode();
@@ -180,13 +169,8 @@ String Node::ToCode(int indent) {
 		s.Cat('\t', indent);
 		s << nodes.Top().ToCode(indent);
 	}
-	else if (kind == CLASS) {
-		s << "class " << name << "\n";
-		s.Cat('\t', indent);
-		s << nodes.Top().ToCode(indent);
-	}
 	else if (kind == CALL) {
-		s << str_data << "(";
+		s << name << "(";
 		for(int i = 0; i < nodes.GetCount(); i++) {
 			if (i) s << ", ";
 			s << nodes[i].ToCode();
@@ -247,28 +231,6 @@ String Node::ToCode(int indent) {
 	}
 	else if (kind == BREAK) {
 		s << "break";
-	}
-	else if (kind == USING) {
-		s << "using ";
-		s << nodes[0].ToCode();
-	}
-	else if (kind == NAMESPACE) {
-		s << "namespace ";
-		s << nodes[0].ToCode();;
-		if (nodes.GetCount() > 1)
-			s << "\n" << nodes[1].ToCode(indent);
-	}
-	else if (kind == TRY) {
-		s << "try\n" << nodes[0].ToCode();
-		if (nodes.GetCount() > 1) {
-			s << nodes[1].ToCode(indent);
-		}
-	}
-	else if (kind == CATCH) {
-		s << "catch (" << nodes[0].ToCode() << ") ";
-		if (nodes.GetCount() > 1) {
-			s << nodes[1].ToCode(indent);
-		}
 	}
 	else if (kind == CASE) {
 		s << "case " << nodes[0].ToCode() << ":\n";
@@ -337,14 +299,7 @@ void Parser::Factor() {
 		}
 		// Class, Function
 		else if (first_char >= 'A' && first_char <= 'Z') {
-			while (p.IsChar(':')) {
-				p.PassChar2(':', ':');
-				id << "::" << p.ReadId();
-			}
-			if(p.IsChar('('))
-				Path(id);
-			else
-				TopScope() = FunctionRefNode(id);
+			Path(id);
 		}
 		else p.ThrowError("Unexpected character");
 	}
@@ -390,22 +345,18 @@ void Parser::Unary() {
 void Parser::Type() {
 	Node& a = TopScope();
 	Unary();
-	if (is_mathmode) {
-		for(;;) {
-			if (p.Char('\'')) {Op(OP_TYPE);		Unary();		PopScope();}
-			else return;
-		}
+	for(;;) {
+		if (p.Char('\'')) {Op(OP_TYPE);		Unary();		PopScope();}
+		else return;
 	}
 }
 
 void Parser::Expo() {
 	Node& a = TopScope();
 	Type();
-	if (is_mathmode) {
-		for(;;) {
-			if (p.Char2('*', '*')) {Op(OP_POW);		Type();		PopScope();}
-			else return;
-		}
+	for(;;) {
+		if (p.Char2('*', '*')) {Op(OP_POW);		Type();		PopScope();}
+		else return;
 	}
 }
 
@@ -490,7 +441,7 @@ void Parser::Base() {
 }
 
 void Parser::CompilationUnit() {
-	PushScope(GetCode().root);
+	PushScope(code.root);
 	TopScope() = CompilationUnitNode();
 	
 	while (!p.IsEof()) {
@@ -560,63 +511,24 @@ void Parser::Statement() {
 	
 	char first_char = p.PeekChar();
 	
-	if (p.IsChar2('M','{')) {
-		p.Char('M');
-		is_mathmode++;
-		Block(true);
-		is_mathmode--;
-	}
-	
 	// Class, Function
-	else if (first_char >= 'A' && first_char <= 'Z') {
+	if (first_char >= 'A' && first_char <= 'Z') {
 		
 		String id = p.ReadId();
 		
-		while (p.IsChar(':')) {
-			p.PassChar2(':', ':');
-			id << "::" << p.ReadId();
-		}
 		
 		bool is_ptr = p.Char('*');
 		bool is_ref = p.Char('&');
 		int flag = (is_ptr << 1) | (is_ref << 0);
 		
 		// Call
-		if(p.IsChar('(')) {
-			Path(id);
-		}
-		// Function declaring
-		else if (p.IsId()) {
-			String id2 = p.ReadId();
-			
-			char first_char2 = id2[0];
-			
-			// Declare variable
-			if (first_char2 >= 'a' && first_char2 <= 'z') {
-				for(;;) {
-					TopScope() = VariableNode(id, id2, flag);
-					if (p.Char('=')) {
-						AddScope();
-						Base();
-						PopScope();
-					}
-					if (!p.Char(',')) break;
-					PopScope();
-					AddScope();
-					id2 = p.ReadId();
-				}
-				p.Char(';');
-			}
-			// Declare Function
-			else if (first_char2 >= 'A' && first_char2 <= 'Z') {
-				ParseFunctionDefinition(id, id2);
-			}
-			
-			else p.ThrowError("Unexpected input");
-		}
-		// Class, Function reference
-		else {
-			TopScope() = FunctionRefNode(id);
+		Path(id);
+		
+		if (p.IsChar('{')) {
+			TopScope().SetKind(FUNC);
+			AddScope();
+			Block();
+			PopScope();
 		}
 	}
 	else if (p.IsChar('{')) {
@@ -714,42 +626,10 @@ void Parser::Statement() {
 		}
 		p.PassChar(';');
 	}
-	else if (p.IsId("class")) {
-		ParseClassDefinition();
-	}
-	else if (p.IsId("try")) {
-		ParseTryDefinition();
-	}
-	else if (p.Id("break")) {
-		TopScope() = BreakNode();
-		
-		p.PassChar(';');
-		
-        CheckLegalBreak();
-	}
 	else if (p.Id("continue")) {
 		p.PassChar(';');
 		
         CheckLegalBreak();
-	}
-	else if (p.Id("using")) {
-		TopScope() = UsingNode();
-		bool is_namespace = p.Id("namespace");
-		if (is_namespace) AddScope() = NamespaceNode();
-		AddScope();
-		Base();
-		PopScope();
-		if (is_namespace) PopScope();
-	}
-	else if (p.Id("namespace")) {
-		TopScope() = NamespaceNode();
-		AddScope();
-		Base();
-		PopScope();
-		AddScope();
-		Block();
-		PopScope();
-		
 	}
 	else if (p.IsId() || p.IsInt() || p.IsDouble() || p.IsString() || p.IsChar('-')) {
 		Base();
@@ -774,7 +654,7 @@ void Parser::CheckLegalBreak() {
             break;
         }
 
-        if (kind == FUNC || kind == CLASS)
+        if (kind == FUNC)
             break;
     }
 
@@ -789,46 +669,6 @@ void Parser::Op(int i) {
 	tmp.Swap(a);
 	TopScope().Add().Swap(tmp);
 	AddScope();
-}
-
-void Parser::ParseFunctionDefinition(String ret_type, String func_name) {
-	TopScope() = FunctionNode(ret_type, func_name);
-	
-	ParseFunctionArguments();
-	
-	AddScope();
-	Block();
-	PopScope();
-	
-}
-
-void Parser::ParseTryDefinition() {
-	p.PassId("try");
-	TopScope() = TryNode();
-	
-	AddScope();
-	Statement();
-	PopScope();
-	
-	if (p.Id("catch")) {
-		AddScope() = CatchNode();
-		ParseFunctionArguments();
-		AddScope();
-		Statement();
-		PopScope();
-		PopScope();
-	}
-}
-
-void Parser::ParseClassDefinition() {
-	p.PassId("class");
-	String cls_name = p.ReadId();
-	
-	TopScope() = ClassNode(cls_name);
-	
-	AddScope();
-	Block();
-	PopScope();
 }
 
 void Parser::FunctionCall(String func_name) {
@@ -848,47 +688,26 @@ void Parser::FunctionCall(String func_name) {
 	p.PassChar(')');
 }
 
-void Parser::ParseFunctionArguments() {
-	p.PassChar('(');
-	
-	while (!p.IsChar(')')) {
-		AddScope();
-		String type = p.ReadId();
-		
-		bool is_ptr = p.Char('*');
-		bool is_ref = p.Char('&');
-		int flag = (is_ptr << 1) | (is_ref << 0);
-		
-		String id = p.ReadId();
-		TopScope() = VariableNode(type, id, flag);
-		if (!p.IsChar(')'))
-			p.PassChar(',');
-		PopScope();
-	}
-	
-	p.PassChar(')');
-}
-
-
 CONSOLE_APP_MAIN {
-	Code& code = GetCode();
 	
-	String script = LoadFile(GetDataFile("test.oct"));
+	
+	String script = LoadFile(GetDataFile("test.mo"));
 	
 	Parser p1;
+	Code& c1 = p1.GetCode();
 	p1.Set(script);
 	
 	try {
 		p1.CompilationUnit();
-		code.Dump();
-		String code1 = code.GetPortal().ToCode();
+		c1.Dump();
+		String code1 = c1.GetPortal().ToCode();
 		LOG(code1);
 		
-		code.GetPortal().Clear();
 		Parser p2;
+		Code& c2 = p2.GetCode();
 		p2.Set(code1);
 		p2.CompilationUnit();
-		String code2 = code.GetPortal().ToCode();
+		String code2 = c2.GetPortal().ToCode();
 		
 		int count = min(code2.GetLength(), code1.GetLength());
 		int line = 0, col = 0;
@@ -911,25 +730,4 @@ CONSOLE_APP_MAIN {
 		GetCode().Dump();
 		LOG("Exception: " << e);
 	}
-	
-	/*CParser p(script);
-	try {
-		String id;
-		if(p.IsId()) {
-			CParser::Pos pos = p.GetPos();
-			id = p.ReadId();
-			if(p.Char('=')) {
-				double x = Exp(p);
-				Cout() << id << " <- " << x << '\n';
-				var.GetAdd(id) = x;
-				goto done;
-			}
-			p.SetPos(pos);
-		}
-		Cout() << Exp(p) << '\n';
-	done:;
-	}
-	catch(CParser::Error e) {
-		Cout() << "ERROR: " << e << '\n';
-	}*/
 }

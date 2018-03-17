@@ -2,7 +2,7 @@ uses
 	Core;
 
 file
-	test.oct,
+	test.mo,
 	Script.h,
 	Script.cpp;
 

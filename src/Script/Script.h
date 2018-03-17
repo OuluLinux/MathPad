@@ -5,15 +5,14 @@
 #include <Core/Core.h>
 using namespace Upp;
 
+typedef Tuple<String, int, int, String> Error;
+
 enum {
 	UNKNOWN,
 	COMPILATIONUNIT,
 	ID,
 	OP,
-	VARIABLE,
-	FUNCREF,
 	FUNC,
-	CLASS,
 	CALL,
 	INTLITERAL,
 	DOUBLELITEREAL,
@@ -27,10 +26,6 @@ enum {
 	FOR,
 	RETURN,
 	BREAK,
-	USING,
-	NAMESPACE,
-	TRY,
-	CATCH,
 	CASE,
 	DEFAULT
 };
@@ -109,10 +104,7 @@ inline String GetNodeHeaderString(int kind, const String& name, const int& int_d
 		case COMPILATIONUNIT: return "Compilation unit";
 		case ID: return "Ident (" + (name) + ")";
 		case OP: return "Op (" + GetOpString(int_data) + ")";
-		case VARIABLE: return "Variable (" + (str_data + " " + name) + ") " + ((int_data & (1 << 1)) ? "* " : " ") + ((int_data & (1 << 0)) ? "& " : " ");
-		case FUNCREF: return "Function reference (" + (str_data) + ")";
 		case FUNC: return "Function (" + (str_data + " " + name) + ")";
-		case CLASS: return "Class (" + (name) + ")";
 		case CALL: return "Call (" + (str_data) + ")";
 		case INTLITERAL: return "Int literal (" + IntStr(int_data) + ")";
 		case DOUBLELITEREAL: return "Double literal (" + DblStr(dbl_data) + ")";
@@ -126,10 +118,6 @@ inline String GetNodeHeaderString(int kind, const String& name, const int& int_d
 		case FOR: return "For";
 		case RETURN: return "Return";
 		case BREAK: return "Break";
-		case USING: return "Using (" + (str_data) + ")";
-		case NAMESPACE: return "Namespace (" + (str_data) + ")";
-		case TRY: return "Try";
-		case CATCH: return "Catch";
 		case CASE: return "Case";
 		case DEFAULT: return "Default";
 		default: return "<no kind string set>";
@@ -169,7 +157,10 @@ public:
 	int GetKind() const {return kind;}
 	String GetKey() const {return name;}
 	
+	void SetKind(int i) {kind = i;}
 	void SetInt(int i) {int_data = i;}
+	void SetDouble(double d) {dbl_data = d;}
+	void SetString(String s) {str_data = s;}
 	void Swap(Node& n);
 	void Clear() {nodes.Clear(); name=""; str_data=""; dbl_data=0; int_data=0; kind=0; line=-1; col=-1;}
 	
@@ -200,7 +191,6 @@ inline Code& GetCode() {return Single<Code>();}
 class Parser {
 	CParser p;
 	Vector<Node*> scopes;
-	int is_mathmode = false;
 	
 public:
 	typedef Parser CLASSNAME;
@@ -224,21 +214,14 @@ public:
 	inline Node ForNode() {Node n(FOR); GetLocation(n); return n;}
 	inline Node ReturnNode() {Node n(RETURN); GetLocation(n); return n;}
 	inline Node BreakNode() {Node n(BREAK); GetLocation(n); return n;}
-	inline Node UsingNode() {Node n(USING); GetLocation(n); return n;}
-	inline Node NamespaceNode() {Node n(NAMESPACE); GetLocation(n); return n;}
-	inline Node TryNode() {Node n(TRY); GetLocation(n); return n;}
-	inline Node CatchNode() {Node n(CATCH); GetLocation(n); return n;}
 	inline Node CaseNode() {Node n(CASE); GetLocation(n); return n;}
 	inline Node DefaultNode() {Node n(DEFAULT); GetLocation(n); return n;}
 	inline Node IntLiteral(int i) {Node n(INTLITERAL, i); GetLocation(n); return n;}
 	inline Node DoubleLiteral(double d) {Node n(DOUBLELITEREAL, d); GetLocation(n); return n;}
 	inline Node StringLiteral(String s) {Node n(STRINGLITERAL, s); GetLocation(n); return n;}
 	inline Node Ident(String id) {Node n(ID, id, ""); GetLocation(n); return n;}
-	inline Node FunctionRefNode(String id) {Node n(FUNCREF, id); GetLocation(n); return n;}
 	inline Node FunctionNode(String type, String name) {Node n(FUNC, name, type); GetLocation(n); return n;}
-	inline Node CallNode(String id) {Node n(CALL, id); GetLocation(n); return n;}
-	inline Node ClassNode(String id) {Node n(CLASS, id, ""); GetLocation(n); return n;}
-	inline Node VariableNode(String type, String name, int flag) {Node n(VARIABLE, name, type); n.SetInt(flag); GetLocation(n); return n;}
+	inline Node CallNode(String id) {Node n(CALL, id, ""); GetLocation(n); return n;}
 	
 	void Set(const String& s) {p.Set(s);}
 	void Factor();
@@ -258,16 +241,17 @@ public:
 	void Statement();
 	void CheckLegalBreak();
 	void Op(int i);
-	void ParseFunctionDefinition(String ret_type, String func_name);
-	void ParseTryDefinition();
-	void ParseClassDefinition();
 	void FunctionCall(String func_name);
-	void ParseFunctionArguments();
 	
 	
 	
 	Callback1<String> WhenError;
 	
 };
+
+
+inline String SingleRef(const String& s) {return s.Right(1) == "&" ? s : s + "&";}
+
+
 
 #endif

@@ -1,0 +1,8 @@
+#ifndef _MathCore_icpp_init_stub
+#define _MathCore_icpp_init_stub
+#include "Core/init"
+#include "RefCore/init"
+#include "MathCore/backend/xcasgiac/init"
+#include "MathCore/backend/libtom/init"
+#include "ExeCore/init"
+#endif

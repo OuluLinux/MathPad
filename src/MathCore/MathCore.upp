@@ -1,0 +1,26 @@
+description "\377B128,0,0";
+
+uses
+	Core,
+	LibTom,
+	LibGiac;
+
+file
+	MathCore.h,
+	MathCore.cpp,
+	Var readonly separator,
+	Node.h,
+	Node.cpp,
+	Units.h,
+	Units.cpp,
+	Backend readonly separator,
+	Parser.h,
+	Parser.cpp,
+	BackendUtils.h,
+	BackendUtils.cpp,
+	XcasGiac.h,
+	XcasGiac.cpp;
+
+mainconfig
+	"" = "";
+

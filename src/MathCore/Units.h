@@ -1,0 +1,186 @@
+#ifndef _MathCore_Units_h_
+#define _MathCore_Units_h_
+
+#include "Node.h"
+
+namespace MathCore {
+
+
+// International System of Units
+//  - https://en.wikipedia.org/wiki/International_System_of_Units
+extern Node TypeMetre;
+extern Node TypeKilogram;
+extern Node TypeSecond;
+extern Node TypeAmpere;
+extern Node TypeKelvin;
+extern Node TypeMole;
+extern Node TypeCandela;
+extern Node TypeRadian;
+extern Node TypeSteradian;
+extern Node TypeHertz;
+extern Node TypeNewton;
+extern Node TypePascal;
+extern Node TypeJoule;
+extern Node TypeWatt;
+extern Node TypeCoulomb;
+extern Node TypeVolt;
+extern Node TypeFarad;
+extern Node TypeOhm;
+extern Node TypeSiemens;
+extern Node TypeWeber;
+extern Node TypeTesla;
+extern Node TypeHenry;
+extern Node TypeLumen;
+extern Node TypeLux;
+extern Node TypeBecquerel;
+extern Node TypeGray;
+extern Node TypeSievert;
+extern Node TypeKatal;
+
+// Derived units
+extern Node TypeArea;
+extern Node TypeVolume;
+extern Node TypeMomentOfInertia;
+extern Node TypeDensity;
+extern Node TypeLinearVelocity;
+extern Node TypeAngularVelocity;
+extern Node TypeLinearMomentum;
+extern Node TypeAngularMomentum;
+extern Node TypeLinearAcceleration;
+extern Node TypeAngularAcceleration;
+extern Node TypeForce;
+extern Node TypeTorque;
+extern Node TypeImpulse;
+extern Node TypeEnergy;
+extern Node TypeWork;
+extern Node TypePower;
+extern Node TypeDynamicViscosity;
+extern Node TypeCharge;
+extern Node TypeCurrentDensity;
+extern Node TypeVolumeChargeDensity;
+extern Node TypeSurfaceChargeDensity;
+extern Node TypeLinearChargeDensity;
+extern Node TypeElectricPotential;
+extern Node TypeElectricField;
+extern Node TypeElectricFlux;
+extern Node TypeElectricMoment;
+extern Node TypeMagneticField;
+extern Node TypeMagneticFlux;
+extern Node TypeMagneticMoment;
+extern Node TypePolarization;
+extern Node TypeMagnetization;
+extern Node TypeHeatCapacity;
+extern Node TypeEntropy;
+extern Node TypeSpecificHeat;
+extern Node TypeMolarHeat;
+extern Node TypeEnergyFlux;
+extern Node TypeSurfaceTension;
+extern Node TypeWaveNumber;
+extern Node TypeEnergyDensity;
+extern Node TypeIntensity;
+extern Node TypeBrightness;
+
+
+// Common symbols
+extern Node IdAcceleration;
+extern Node IdImpactParameter;
+extern Node IdSpeedOfSound;
+extern Node IdSpeedOfLightInVacuum;
+extern Node IdDistance;
+extern Node IdEccentricity;
+extern Node IdFrictionalDrag;
+extern Node IdAccelerationDueToGravity;
+extern Node IdPlanckConstant;
+extern Node IdImaginaryUnit;
+extern Node IdImpulse;
+extern Node IdSpringConstant;
+extern Node IdLength;
+extern Node IdMass;
+extern Node IdNumber;
+extern Node IdMomentum;
+extern Node IdPressure;
+extern Node IdDeceleration;
+extern Node IdCharge;
+extern Node IdRadius;
+extern Node IdArcLength;
+extern Node IdTime;
+extern Node IdFourVelocity;
+extern Node IdVelocity;
+extern Node IdSpeed;
+extern Node IdWeight;
+extern Node IdPosition;
+extern Node IdRedShift;
+extern Node IdArea;
+extern Node IdAtomicMass;
+extern Node IdMagneticFluxDensity;
+extern Node IdCapacitance;
+extern Node IdElectricDisplacement;
+extern Node IdEnergy;
+extern Node IdForce;
+extern Node IdUniversalConstantOfGravitation;
+extern Node IdMagneticFieldStrength;
+extern Node IdAction;
+extern Node IdIntensity;
+extern Node IdMomentOfInertia;
+extern Node IdElectricCurrent;
+extern Node IdCurrentDensity;
+extern Node IdKineticEnergy;
+extern Node IdInductance;
+extern Node IdLuminosity;
+extern Node IdMagnetization;
+extern Node IdMoment;
+extern Node IdNormalVector;
+extern Node IdAtomicNumber;
+extern Node IdPower;
+extern Node IdPolarization;
+extern Node IdHeat;
+extern Node IdResistance;
+extern Node IdRadiancy;
+extern Node IdPoyntingVector;
+extern Node IdTemperature;
+extern Node IdTangentialVector;
+extern Node IdPotentialEnergy;
+extern Node IdVoltage;
+extern Node IdPotential;
+extern Node IdHydrogenRatio;
+extern Node IdHeliumRatio;
+extern Node IdMetalsRatio;
+extern Node IdImpedance;
+extern Node IdProtonNumber;
+extern Node IdAngularAcceleration;
+extern Node IdVelocityInTermsOfC;
+extern Node IdEinsteinFactor;
+extern Node IdChange;
+extern Node IdElectricConstant;
+extern Node IdEfficiency;
+extern Node IdAngularDisplacement;
+extern Node IdTorsionConstant;
+extern Node IdPropertLength;
+extern Node IdWavelength;
+extern Node IdMagneticConstant;
+extern Node IdProperMass;
+extern Node IdFrequency;
+extern Node IdCircumferenceToDiameterRatio;
+extern Node IdParallax;
+extern Node IdDensity;
+extern Node IdStefanBolzmannConstant;
+extern Node IdSurfaceChargeDensity;
+extern Node IdTorque;
+extern Node IdProperTime;
+extern Node IdSusceptibility;
+extern Node IdAngularVelocity;
+extern Node IdGammaFunction;
+extern Node IdStepFunction;
+extern Node IdCosmologicalConstant;
+extern Node IdRepeatedProduct;
+extern Node IdRepeatedSum;
+extern Node IdFieldStrength;
+extern Node IdWaveFunction;
+extern Node IdAngularPrecessionVelocity;
+extern Node IdSolidAngle;
+
+
+}
+
+
+#endif
