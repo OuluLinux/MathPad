@@ -1,8 +1,0 @@
-uses
-	Core;
-
-file
-	test.mo,
-	Script.h,
-	Script.cpp;
-
