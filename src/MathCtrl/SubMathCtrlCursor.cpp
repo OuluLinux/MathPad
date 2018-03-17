@@ -2,7 +2,7 @@
 
 namespace MathCtrl { using namespace MathCtrl; using namespace MathCore;	
 
-#define OP_BINDER(op) Node& join = node->GetOpJoinNode(op, !IsRightHandFocus());\
+#define OP_BINDER(op) Node join = node->GetOpJoinNode(op, !IsRightHandFocus());\
 	join = Op(op).Add(join).Add(Void());\
 	RefreshNode(&join[1]);\
 	return true;

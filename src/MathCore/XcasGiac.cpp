@@ -1,112 +1,107 @@
-#include <LibGiac/LibGiac.h>
 #include "MathCore.h"
 #include "Parser.h"
 
 namespace MathCore {
 	
+String RunCommand(String in) {
+	String out;
+	
+	static LocalProcess lp;
+	
+	if (!lp.IsRunning()) {
+		lp.Start("cmdline.exe");
+	}
+	
+	//in = "solve(y=x^2,x);\n";
+	in << ";\n";
+	
+	in.Replace(" ", "");
+	lp.Write(in);
+	
+	Sleep(1);
+	while (true) {
+		String s;
+		lp.Read(s);
+		if (s.GetCount() && s.GetCount())
+			out << s;
+		else if (out.GetCount())
+			break;
+	}
+		
+	
+	DUMP(in);
+	DUMP(out);
+	
+	return out;
+}
 
 Node Eliminate(Node list, Node var) {
 	String giac_cmd = "eliminate(" + list.AsInlineString() + "," + var.AsDataInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    Node out = ParseExpression(g.print(0).c_str());
+    Node out = ParseExpression(RunCommand(giac_cmd));
     if (out.IsArray() && out.GetCount() == 1) out = out[0];
     return out;
 }
 
 Node Solve(Node n) {
 	String giac_cmd = "solve(" + n.AsInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    Node out = ParseExpression(g.print(0).c_str());
+    Node out = ParseExpression(RunCommand(giac_cmd));
     if (out.IsArray() && out.GetCount() == 1) out = out[0];
     return out;
 }
 
 Node SolveComplex(Node n) {
 	String giac_cmd = "csolve(" + n.AsInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    Node out = ParseExpression(g.print(0).c_str());
+    Node out = ParseExpression(RunCommand(giac_cmd));
     if (out.IsArray() && out.GetCount() == 1) out = out[0];
     return out;
 }
 
 Node FSolve(Node n) {
 	String giac_cmd = "fsolve(" + n.AsInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    Node out = ParseExpression(g.print(0).c_str());
+    Node out = ParseExpression(RunCommand(giac_cmd));
     if (out.IsArray() && out.GetCount() == 1) out = out[0];
     return out;
 }
 
 Node SolveVar(Node expr, Node key) {
 	String giac_cmd = "solve(" + expr.AsInlineString() + ", " + key.AsInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-	g=giac::protecteval(g,1,0);
-    Node out = ParseExpression(g.print(0).c_str());
+    Node out = ParseExpression(RunCommand(giac_cmd));
     if (out.IsArray() && out.GetCount() == 1) out = out[0];
     return out;
 }
 
 Node SolveComplexVar(Node expr, Node key) {
 	String giac_cmd = "csolve(" + expr.AsInlineString() + ", " + key.AsInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    Node out = ParseExpression(g.print(0).c_str());
+    Node out = ParseExpression(RunCommand(giac_cmd));
     if (out.IsArray() && out.GetCount() == 1) out = out[0];
     return out;
 }
 
 Node FSolveVar(Node expr, Node key) {
 	String giac_cmd = "fsolve(" + expr.AsInlineString() + ", " + key.AsInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    Node out = ParseExpression(g.print(0).c_str());
+    Node out = ParseExpression(RunCommand(giac_cmd));
     if (out.IsArray() && out.GetCount() == 1) out = out[0];
     return out;
 }
 
 Node SimplifySum(Node expr, Node key, Node min, Node max) {
 	String giac_cmd = "sum(" + expr.AsInlineString() + ", " + key.AsInlineString() + ", " + min.AsInlineString() + ", " + max.AsInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    return ParseExpression(g.print(0).c_str());
+    return ParseExpression(RunCommand(giac_cmd));
 }
 
 Node Simplify(Node n) {
 	String giac_cmd = "simplify(" + n.AsInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    return ParseExpression(g.print(0).c_str());
+    return ParseExpression(RunCommand(giac_cmd));
 }
 
 Node TypeSimplify(Node n) {
 	String giac_cmd = "usimplify(" + n.AsInlineString() + ")";
-	LOG(giac_cmd);
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    LOG(g.print(0).c_str());
-    return ParseExpression(g.print(0).c_str());
+    return ParseExpression(RunCommand(giac_cmd));
 }
 
 Node Integrate(Node n) {
 	String giac_cmd = "integrate(" + n.AsInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    return ParseExpression(g.print(0).c_str());
+    return ParseExpression(RunCommand(giac_cmd));
 }
 
 Node Integrate(Node expr, Node min, Node max) {
@@ -114,27 +109,17 @@ Node Integrate(Node expr, Node min, Node max) {
 	Node var = FindVar(tmp);
 	if (var.IsNull()) var = id("x");
 	String giac_cmd = "integrate(" + expr.AsInlineString() + ", " + var.AsInlineString() + ", " + min.AsInlineString() + ", " + max.AsInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    return ParseExpression(g.print(0).c_str());
+    return ParseExpression(RunCommand(giac_cmd));
 }
 
 Node Integrate(Node expr, Node key) {
 	String giac_cmd = "integrate(" + expr.AsInlineString() + ", " + key.AsInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    return ParseExpression(g.print(0).c_str());
+    return ParseExpression(RunCommand(giac_cmd));
 }
 
 Node Integrate(Node expr, Node key, Node min, Node max) {
 	String giac_cmd = "integrate(" + expr.AsInlineString() + ", " + key.AsInlineString() + ", " + min.AsInlineString() + ", " + max.AsInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    LOG(g.print(0).c_str());
-    return ParseExpression(g.print(0).c_str());
+    return ParseExpression(RunCommand(giac_cmd));
 }
 
 Node Floating(Node n) {
@@ -143,55 +128,34 @@ Node Floating(Node n) {
 		return Int(0);
 	}
 	String giac_cmd = "float(" + n.AsInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    // TODO: FIX: WHY XCAS SOMETIMES STARTS TO PRINT , INSTEAD OF . ???
-    String hotfix = g.print(0).c_str();
+    String hotfix = RunCommand(giac_cmd);
     hotfix.Replace(",",".");
     return ParseExpression(hotfix);
-    //return ParseExpression(g.print(0).c_str());
 }
 
 Node FindMin(Node expr, Node var) {
 	String giac_cmd = "fMin(" + expr.AsInlineString() + ", " + var.AsInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    return ParseExpression(g.print(0).c_str());
+    return ParseExpression(RunCommand(giac_cmd));
 }
 
 Node FindMax(Node expr, Node var) {
 	String giac_cmd = "fMax(" + expr.AsInlineString() + ", " + var.AsInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    return ParseExpression(g.print(0).c_str());
+    return ParseExpression(RunCommand(giac_cmd));
 }
 
 Node Limit(Node expr, Node key, Node closing) {
 	String giac_cmd = "limit(" + expr.AsInlineString() + ", " + key.AsInlineString() + ", " + closing.AsInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    return ParseExpression(g.print(0).c_str());
+    return ParseExpression(RunCommand(giac_cmd));
 }
 
 Node LimitSimplify(Node expr, Node key, Node closing) {
 	String giac_cmd = "limit(simplify(" + expr.AsInlineString() + "), " + key.AsInlineString() + ", " + closing.AsInlineString() + ")";
-	//LOG(giac_cmd);
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    return ParseExpression(g.print(0).c_str());
+    return ParseExpression(RunCommand(giac_cmd));
 }
 
 Node LinearSolve(Node expr_list, Node key_list) {
 	String giac_cmd = "linsolve(" + expr_list.AsInlineString() + ", " + key_list.AsInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    return ParseExpression(g.print(0).c_str());
+    return ParseExpression(RunCommand(giac_cmd));
 }
 
 
@@ -225,10 +189,8 @@ Node GetVectorSpaceVector(Node space, Node vec) {
 	if (c1 <= 3) {for(int i = 0; i < c1; i++) {if (i) giac_cmd.Cat(','); giac_cmd.Cat('x'+i);}}
 	else         {for(int i = 0; i < c1; i++) {if (i) giac_cmd.Cat(','); giac_cmd.Cat('a'+i);}}
 	giac_cmd += "])";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g = giac::protecteval(g,1,0);
-    return ParseExpression(g.print(0).c_str());
+	
+    return ParseExpression(RunCommand(giac_cmd));
 }
 
 
@@ -238,10 +200,7 @@ Node AngleVecs(Node vec0, Node vec1) {
 	Node theory = Cos(id("Q")) == (id("v_0") * id("v_1"))/(Length(id("v_0"))*Length(id("v_1")));
 	if (vec0.GetCount() != vec1.GetCount()) return Void();
 	String giac_cmd = "arccos((" + VectorMultiply(vec0, vec1).AsInlineString() + ")/(" + VectorLength(vec0).AsInlineString() + "*" + VectorLength(vec1).AsInlineString() + "))";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g = giac::protecteval(g,1,0);
-    return ParseExpression(g.print(0).c_str());
+    return ParseExpression(RunCommand(giac_cmd));
 }
 
 Node SimplifyVector(Node vec) {
@@ -251,10 +210,7 @@ Node SimplifyVector(Node vec) {
 		String giac_cmd = "simplify(";
 		giac_cmd +=  vec[i].AsInlineString();
 		giac_cmd += ")";
-		giac::gen g(giac_cmd.Begin(),0);
-		if (is_zero(g)) return Void();
-	    g = giac::protecteval(g,1,0);
-		out.Add( ParseGiacExpression(g.print(0).c_str()) );
+		out.Add(ParseGiacExpression(RunCommand(giac_cmd)));
     }
 	return out;
 }
@@ -265,20 +221,14 @@ Node Solve2(Node expr0, Node expr1, Node key0, Node key1) {
 	String giac_cmd = "solve( [";
 	giac_cmd += expr0.AsInlineString() + ", " + expr1.AsInlineString() + "] ";
 	giac_cmd += ", [" + find + "])";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g = giac::protecteval(g,1,0);
-    return ParseGiacExpression(g.print(0).c_str());
+    return ParseGiacExpression(RunCommand(giac_cmd));
 }
 
 
 Node GetVectorCrossVectors(Node vec0, Node vec1) {
 	if (vec0.GetCount() != vec1.GetCount()) return Void();
 	String giac_cmd = "cross(" + vec0.AsInlineString() + ", " + vec1.AsInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g = giac::protecteval(g,1,0);
-    return ParseGiacExpression(g.print(0).c_str());
+    return ParseGiacExpression(RunCommand(giac_cmd));
 }
 
 Node SolveVector2(Node vec0, Node vec1, Node key0, Node key1) {
@@ -291,10 +241,7 @@ Node SolveVector2(Node vec0, Node vec1, Node key0, Node key1) {
 		giac_cmd += vec0[i].AsInlineString() + "=" + vec1[i].AsInlineString();
 	}
 	giac_cmd += "], [" + find + "])";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    return ParseGiacExpression(g.print(0).c_str());
+    return ParseGiacExpression(RunCommand(giac_cmd));
 }
 
 
@@ -308,10 +255,7 @@ Node LinePoint(Node line, Node point) {
 		giac_cmd += GetElement(line, i, find).AsInlineString() + "=" + point[i].AsInlineString();
 	}
 	giac_cmd += "], [" + find.AsInlineString() + "])";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    return ParseGiacExpression(g.print(0).c_str());
+    return ParseGiacExpression(RunCommand(giac_cmd));
 }
 
 
@@ -325,50 +269,32 @@ Node LineCross(Node line0, Node line1, Node key0, Node key1) {
 		giac_cmd += GetElement(line0, i, key0).AsInlineString(); + "=" + GetElement(line1, i, key1).AsInlineString();;
 	}
 	giac_cmd += "], [" + find + "])";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    return ParseGiacExpression(g.print(0).c_str());
+    return ParseGiacExpression(RunCommand(giac_cmd));
 }
 
 Node Ellipse(Node n) {
 	String giac_cmd = "ellipse(" + n.AsInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) {return Void();}
-    g=giac::protecteval(g,1,0);
-    return ParseGiacExpression(g.print(0).c_str());
+    return ParseGiacExpression(RunCommand(giac_cmd));
 }
 
 Node Hyperbola(Node n) {
 	String giac_cmd = "hyperbola(" + n.AsInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) {return Void();}
-    g=giac::protecteval(g,1,0);
-    return ParseGiacExpression(g.print(0).c_str());
+    return ParseGiacExpression(RunCommand(giac_cmd));
 }
 
 Node Parabola(Node n) {
 	String giac_cmd = "parabola(" + n.AsInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) {return Void();}
-    g = giac::protecteval(g,1,0);
-    return ParseGiacExpression(g.print(0).c_str());
+    return ParseGiacExpression(RunCommand(giac_cmd));
 }
 
 Node Derive(Node n) {
 	String giac_cmd = "derive(" + n.AsInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    return ParseExpression(g.print(0).c_str());
+    return ParseExpression(RunCommand(giac_cmd));
 }
 
 Node Derive(Node n, Node key) {
 	String giac_cmd = "derive(" + n.AsInlineString() + "," + key.AsInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    return ParseExpression(g.print(0).c_str());
+    return ParseExpression(RunCommand(giac_cmd));
 }
 
 Node DeriveFunction(Node n) {
@@ -442,10 +368,7 @@ Node DeriveCurve(Node n) {
 
 Node Evaluate(Node n) {
 	String giac_cmd = n.AsInlineString();
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    return ParseExpression(g.print(0).c_str());
+    return ParseExpression(RunCommand(giac_cmd));
 }
 
 bool Test(Node n) {
@@ -499,102 +422,66 @@ Node ATan2(Node x, Node y) {
 
 Node PartialFractionDecomposition(Node n) {
 	String giac_cmd = "partfrac(" + n.AsInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    return ParseExpression(g.print(0).c_str());
+    return ParseExpression(RunCommand(giac_cmd));
 }
 
 Node PartialFractionDecomposition(Node n, Node key) {
 	String giac_cmd = "partfrac(" + n.AsInlineString() + "," + key.AsInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    return ParseExpression(g.print(0).c_str());
+    return ParseExpression(RunCommand(giac_cmd));
 }
 
 
 Node Factor(Node n) {
 	String giac_cmd = "factor(" + n.AsInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    return ParseExpression(g.print(0).c_str());
+    return ParseExpression(RunCommand(giac_cmd));
 }
 
 Node Sum(Node expr, Node var, Node begin, Node end) {
 	String giac_cmd = "sum(" + expr.AsInlineString() + "," + var.AsInlineString() + "," + begin.AsInlineString() + "," + end.AsInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    return ParseExpression(g.print(0).c_str());
+    return ParseExpression(RunCommand(giac_cmd));
 }
 
 
 Node Real(Node n) {
 	String giac_cmd = "real(" + n.AsInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    return ParseExpression(g.print(0).c_str());
+    return ParseExpression(RunCommand(giac_cmd));
 }
 
 
 Node Imag(Node n) {
 	String giac_cmd = "imag(" + n.AsInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    return ParseExpression(g.print(0).c_str());
+    return ParseExpression(RunCommand(giac_cmd));
 }
 
 
 Node ExpTrig(Node exp) {
 	String giac_cmd = "exp2trig(" + exp.AsInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    return ParseExpression(g.print(0).c_str());
+    return ParseExpression(RunCommand(giac_cmd));
 }
 
 Node SolveDifferentialEquation(Node expr, Node var) {
 	String giac_cmd = "desolve(" + expr.AsInlineString() + "," + var.AsInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    return ParseExpression(g.print(0).c_str());
+    return ParseExpression(RunCommand(giac_cmd));
 }
 
 Node LaplaceTransform(Node expr, Node var) {
 	String giac_cmd = "laplace(" + expr.AsInlineString() + "," + var.AsInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    return ParseExpression(g.print(0).c_str());
+    return ParseExpression(RunCommand(giac_cmd));
 }
 
 Node LaplaceTransform(Node expr, Node var, Node result_var) {
 	String giac_cmd = "laplace(" + expr.AsInlineString() + "," + var.AsInlineString() + "," + result_var.AsInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    return ParseExpression(g.print(0).c_str());
+    return ParseExpression(RunCommand(giac_cmd));
 }
 
 Node LaplaceTransformInversed(Node expr, Node var) {
 	String giac_cmd = "ilaplace(" + expr.AsInlineString() + "," + var.AsInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    return ParseExpression(g.print(0).c_str());
+    return ParseExpression(RunCommand(giac_cmd));
 }
 
 Node LaplaceTransformInversed(Node expr, Node var, Node result_var) {
 	String giac_cmd = "ilaplace(" + expr.AsInlineString() + "," + var.AsInlineString() + "," + result_var.AsInlineString() + ")";
-	giac::gen g(giac_cmd.Begin(),0);
-	if (is_zero(g)) return Void();
-    g=giac::protecteval(g,1,0);
-    return ParseExpression(g.print(0).c_str());
+    return ParseExpression(RunCommand(giac_cmd));
 }
 
 }

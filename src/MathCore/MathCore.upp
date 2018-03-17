@@ -1,9 +1,7 @@
 description "\377B128,0,0";
 
 uses
-	Core,
-	LibTom,
-	LibGiac;
+	Core;
 
 file
 	MathCore.h,
