@@ -126,7 +126,7 @@ protected:
 	double dbl_data;
 	String str_data;
 	int type;
-	Node* inner = NULL;
+	//Node* inner = NULL;
 	
 public:
 	
@@ -140,7 +140,7 @@ public:
 	void operator=(const Node& n);
 	bool IsEqual(const Node& n);
 	
-	Node* GetInner();
+	Node* GetInner() {return NULL;}
 	Node& operator[](int i);
 	Node& At(int i);
 	const Node& AtConst(int i) const;

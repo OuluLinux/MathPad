@@ -189,9 +189,9 @@ bool Node::IsEqual(const Node& n) {
 	return true;
 }
 
-Node* Node::GetInner() {
+/*Node* Node::GetInner() {
 	return inner;
-}
+}*/
 
 Node& Node::operator[](int i) {
 	if (i < 0 || i >= nodes.GetCount())
@@ -1051,7 +1051,7 @@ Node Node::FindSinCos(bool must_have_var) {
 
 Node Node::GetOpJoinNode(int op, bool accept_equal) {
 	Node* n = this;
-	
+	/*
 	int op_level = GetOpLevel();
 	int last_level = 0;
 	int level_steps = 0;
@@ -1123,7 +1123,8 @@ Node Node::GetOpJoinNode(int op, bool accept_equal) {
 		
 		n = n->inner;
 		steps++;
-	}
+	}*/
+	
 	return *n;
 }
 
