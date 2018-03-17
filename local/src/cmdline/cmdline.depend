@@ -1,0 +1,9 @@
+# depslib dependency file v1.0
+1424444186 source:c:\users\parisse\downloads\test\main.cpp
+	<iostream>
+	<giac/giac.h>
+
+1521321495 source:c:\mathpad.git\trunk\local\src\cmdline\main.cpp
+	<iostream>
+	<giac/giac.h>
+
