@@ -15,6 +15,10 @@ public:
 	
 	::MathCtrl::MathCtrl mc;
 	
+	void HelloWorld();
+	
+	void ComplexAnalysis1();
+	
 };
 
 #endif
