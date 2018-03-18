@@ -263,7 +263,7 @@ Node Node::Print(String title, bool lower) {
 	
 }*/
 
-Node Node::Floating() {
+Node& Node::Floating() {
 	if (IsMultiple()) {
 		for(int i = 0; i < nodes.GetCount(); i++)
 			nodes[i].Floating();
@@ -272,7 +272,7 @@ Node Node::Floating() {
 	return *this;
 }
 
-Node Node::Solve() {
+Node& Node::Solve() {
 	if (IsMultiple()) {
 		for(int i = 0; i < nodes.GetCount(); i++)
 			nodes[i].Solve();
@@ -281,7 +281,7 @@ Node Node::Solve() {
 	return *this;
 }
 
-Node Node::Solve(Node key, bool keep_key_equality) {
+Node& Node::Solve(Node key, bool keep_key_equality) {
 	if (IsMultiple()) {
 		for(int i = 0; i < nodes.GetCount(); i++)
 			nodes[i].Solve(key, false);
@@ -293,7 +293,7 @@ Node Node::Solve(Node key, bool keep_key_equality) {
 	return *this;
 }
 
-Node Node::SolveComplex() {
+Node& Node::SolveComplex() {
 	if (IsMultiple()) {
 		for(int i = 0; i < nodes.GetCount(); i++)
 			nodes[i].SolveComplex();
@@ -302,7 +302,7 @@ Node Node::SolveComplex() {
 	return *this;
 }
 
-Node Node::SolveComplex(Node key, bool keep_key_equality) {
+Node& Node::SolveComplex(Node key, bool keep_key_equality) {
 	if (IsMultiple()) {
 		for(int i = 0; i < nodes.GetCount(); i++)
 			nodes[i].SolveComplex(key, false);
@@ -314,7 +314,7 @@ Node Node::SolveComplex(Node key, bool keep_key_equality) {
 	return *this;
 }
 
-Node Node::FSolve() {
+Node& Node::FSolve() {
 	if (IsMultiple()) {
 		for(int i = 0; i < nodes.GetCount(); i++)
 			nodes[i].FSolve();
@@ -323,7 +323,7 @@ Node Node::FSolve() {
 	return *this;
 }
 
-Node Node::FSolve(Node key, bool keep_key_equality) {
+Node& Node::FSolve(Node key, bool keep_key_equality) {
 	if (IsMultiple()) {
 		for(int i = 0; i < nodes.GetCount(); i++)
 			nodes[i].FSolve(key, false);
@@ -335,7 +335,7 @@ Node Node::FSolve(Node key, bool keep_key_equality) {
 	return *this;
 }
 
-Node Node::Simplify() {
+Node& Node::Simplify() {
 	if (IsOp() && GetInt() == OP_EQ && nodes.GetCount() == 2) {
 		if (nodes[0].IsFuncSqrt() && nodes[1].IsFuncSqrt()) {
 			if (nodes[0].GetCount() == 1 && nodes[1].GetCount() == 1) {
@@ -360,7 +360,7 @@ Node Node::Simplify() {
 	return *this;
 }
 
-Node Node::Calculate() {
+Node& Node::Calculate() {
 	for(int i = 0; i < nodes.GetCount(); i++) {
 		nodes[i].Calculate();
 	}
@@ -594,12 +594,12 @@ Node Node::Calculate() {
 	return *this;
 }
 
-Node Node::Factor() {
+Node& Node::Factor() {
 	*this = MathCore::Factor(*this);
 	return *this;
 }
 
-Node Node::TypeSimplify() {
+Node& Node::TypeSimplify() {
 	if (IsOp() && GetInt() == OP_EQ && nodes.GetCount() == 2) {
 		if (nodes[0].IsFuncSqrt() && nodes[1].IsFuncSqrt()) {
 			if (nodes[0].GetCount() == 1 && nodes[1].GetCount() == 1) {
@@ -624,12 +624,12 @@ Node Node::TypeSimplify() {
 	return *this;
 }
 
-Node Node::Parse(const String& expr) {
+Node& Node::Parse(const String& expr) {
 	*this = ParseExpression(expr);
 	return *this;
 }
 
-Node Node::Replace(Node& find, const Node replacing) {
+Node& Node::Replace(Node& find, const Node replacing) {
 	Node tmp(find);
 	if (tmp.Compare(replacing) == 0) return *this;
 	
@@ -685,12 +685,12 @@ Node Node::Replace(Node& find, const Node replacing) {
 	return *this;
 }
 
-Node Node::Replace(Node& equation) {
+Node& Node::Replace(Node& equation) {
 	ASSERT(equation.IsOp() && equation.IsOp(OP_EQ));
 	return Replace(equation.At(0), equation.At(1));
 }
 
-Node Node::Remove(Node* node) {
+Node& Node::Remove(Node* node) {
 	IteratorDeep it = BeginDeep();
 	for (; !it.IsEnd(); it++) {
 		Node& n = *it;
@@ -704,13 +704,13 @@ Node Node::Remove(Node* node) {
 	return *this;
 }
 
-Node Node::Remove(int i) {
+Node& Node::Remove(int i) {
 	nodes[i] = Void();
 	Calculate();
 	return *this;
 }
 
-Node Node::Remove(const Node& n) {
+Node& Node::Remove(const Node& n) {
 	const Node *ptr = &n;
 	if ((int64)ptr == (int64)this) {
 		*this = Void();
@@ -729,7 +729,7 @@ Node Node::Remove(const Node& n) {
 	return *this;
 }
 
-Node Node::RemoveIds() {
+Node& Node::RemoveIds() {
 	if (type == TYPE_ID)
 		*this = Void();
 	else {
@@ -740,7 +740,7 @@ Node Node::RemoveIds() {
 	return *this;
 }
 
-Node Node::RemoveAllExceptOpId() {
+Node& Node::RemoveAllExceptOpId() {
 	if (type != TYPE_ID && type != TYPE_OP && type != TYPE_UNARY)
 		*this = Void();
 	else if (type == TYPE_OP && nodes[0].IsInt() && nodes[1].IsInt()) {
@@ -754,7 +754,7 @@ Node Node::RemoveAllExceptOpId() {
 	return *this;
 }
 
-Node Node::RemoveTypes() {
+Node& Node::RemoveTypes() {
 	if (type == TYPE_TYPE) {
 		*this = nodes[0];
 		return RemoveTypes();
@@ -767,7 +767,7 @@ Node Node::RemoveTypes() {
 	return *this;
 }
 
-Node Node::SolveDomain() {
+Node& Node::SolveDomain() {
 	for(int i = 0; i < nodes.GetCount(); i++) {
 		nodes[i].SolveDomain();
 		nodes[i].Calculate();
@@ -892,7 +892,7 @@ Node Node::SolveDomain() {
 	return *this;
 }
 
-Node Node::SolveImage() {
+Node& Node::SolveImage() {
 	
 	for(int i = 0; i < nodes.GetCount(); i++) {
 		nodes[i].SolveImage();
@@ -936,7 +936,7 @@ Node Node::SolveImage() {
 	return *this;
 }
 
-Node Node::Derive() {
+Node& Node::Derive() {
 	if (IsOp() && GetInt() == OP_EQ) {
 		*this = DeriveFunction(*this);
 	} else {
@@ -950,22 +950,22 @@ Node Node::Derive() {
 	return *this;
 }
 
-Node Node::Derive(const Node key) {
+Node& Node::Derive(const Node key) {
 	*this = MathCore::Derive(*this, key);
 	return *this;
 }
 
-Node Node::Integrate() {
+Node& Node::Integrate() {
 	*this = MathCore::Integrate(*this);
 	return *this;
 }
 
-Node Node::Integrate(const Node key) {
+Node& Node::Integrate(const Node key) {
 	*this = MathCore::Integrate(*this, key);
 	return *this;
 }
 
-Node Node::EraseSigns() {
+Node& Node::EraseSigns() {
 	IteratorDeep it = BeginDeep();
 	for ( ;!it.IsEnd(); ) {
 		Node n = *it;
@@ -977,12 +977,12 @@ Node Node::EraseSigns() {
 	return *this;
 }
 
-Node Node::Evaluate() {
+Node& Node::Evaluate() {
 	*this = MathCore::Evaluate(*this);
 	return *this;
 }
 
-Node Node::Ceiling() {
+Node& Node::Ceiling() {
 	Node fn = Function("ceiling").Add(*this);
 	*this = MathCore::Evaluate(fn);
 	return *this;
@@ -996,7 +996,7 @@ Node Node::CalculateStepsPrint(String s) {
 	
 }*/
 
-Node Node::GetMul(const Node other_in_mul) {
+Node& Node::GetMul(const Node other_in_mul) {
 	IteratorDeep it = BeginDeep();
 	for (; !it.IsEnd();) {
 		if (it->Compare(other_in_mul) == 0) {
@@ -1015,15 +1015,15 @@ Node Node::GetMul(const Node other_in_mul) {
 	return *this;
 }
 
-Node Node::FindMin(const Node key) {
+Node& Node::FindMin(const Node key) {
 	return MathCore::FindMin(*this, key);
 }
 
-Node Node::FindMax(const Node key) {
+Node& Node::FindMax(const Node key) {
 	return MathCore::FindMax(*this, key);
 }
 
-Node Node::FindArrayTwoEquals() {
+Node& Node::FindArrayTwoEquals() {
 	if (!IsMultiple()) return Void();
 	Upp::Array<Node> level_array = SplitLevelArray();
 	for(int i = 0; i < level_array.GetCount(); i++) {
@@ -1035,7 +1035,7 @@ Node Node::FindArrayTwoEquals() {
 	return Void();
 }
 
-Node Node::FindSinCos(bool must_have_var) {
+Node& Node::FindSinCos(bool must_have_var) {
 	IteratorDeep it = BeginDeep();
 	for ( ;!it.IsEnd(); it++) {
 		Node n = *it;
@@ -1049,7 +1049,7 @@ Node Node::FindSinCos(bool must_have_var) {
 	return Node();
 }
 
-Node Node::GetOpJoinNode(int op, bool accept_equal) {
+Node& Node::GetOpJoinNode(int op, bool accept_equal) {
 	Node* n = this;
 	/*
 	int op_level = GetOpLevel();
@@ -1480,7 +1480,56 @@ String Node::AsString(int indent) {
 }
 
 String Node::AsInlineString() const {
-	return GetString() + ", " + IntStr(GetInt()) + ", " + GetOpString() + ", " + GetTypeString();
+	String s;
+	switch (type) {
+		case TYPE_INT:
+			return "(" + IntStr(int_data) + ")";
+		case TYPE_DOUBLE:
+			return "(" + DblStr(dbl_data) + ")";
+		case TYPE_TEXT:
+			return "(\"" + str_data + "\")";
+		case TYPE_ID:
+		case TYPE_VECTORID:
+			return "(" + str_data + ")";
+		case TYPE_TYPE:
+			return "(" + nodes[0].AsInlineString() + ")_(" + nodes[1].AsInlineString() + ")";
+		case TYPE_IMG:
+			return "(i)";
+		case TYPE_OP:
+			return "(" + nodes[0].AsInlineString() + ")" + GetOpString() + "(" + nodes[1].AsInlineString() + ")";
+		case TYPE_UNARY:
+			switch (int_data) {
+			case UNARY_NEG:
+			case UNARY_NEGSET:
+				return "-(" + nodes[0].AsInlineString() + ")";
+			}
+			return "";
+		case TYPE_FUNCTION:
+			s << GetFunctionName();
+		case TYPE_PARENTHESIS:
+			s << "(";
+			for(int i = 0; i < nodes.GetCount(); i++) {
+				if (i) s << ",";
+				s << nodes[i].AsInlineString();
+			}
+			s << ")";
+			return s;
+		case TYPE_ARRAY:
+		case TYPE_MATRIX:
+		case TYPE_SET:
+		case TYPE_LINEARSET:
+		case TYPE_RANGE:
+		case TYPE_SPACE:
+			s << "[";
+			for(int i = 0; i < nodes.GetCount(); i++) {
+				if (i) s << ",";
+				s << nodes[i].AsInlineString();
+			}
+			s << "]";
+			return s;
+		default: return "";
+	}
+	
 }
 
 String Node::AsDataInlineString() const {

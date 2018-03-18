@@ -8,6 +8,7 @@ String RunCommand(String in) {
 	
 	static LocalProcess lp;
 	
+	
 	if (!lp.IsRunning()) {
 		lp.Start("cmdline.exe");
 	}
