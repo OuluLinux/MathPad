@@ -152,16 +152,89 @@ void Exercises::ComplexAnalysis1() {
 		mc.Outer();
 	}
 	
-	/*{
-		mc.Inner("Find root");
+	{
+		mc.Inner("Define complex area A");
 		
-		Node n0 = ParseExpression("z^4+4=0");
+		Node n0 = ParseExpression("[abs(z) < 2, re(z)>0]");
 		mc.Print("Input", n0);
 		
+		Node n1 = ParseExpression("[sqrt(x^2+y^2)<2, x>0]");
+		mc.Print("Interpreted input", n1);
 		
+		Node n2 = Node("A") == Set();
+		n2[1].Add(BelongsTo(ParseExpression("z=r*e^(i*omega)"), Node("C")));
+		n2[1].Add(BelongsTo(Node("r"), Range(0,2,0,0)));
+		n2[1].Add(BelongsTo(Node("omega"), Range(-Node("pi")/2,Node("pi")/2,0,0)));
+		mc.Print("Area in polar coordinates", n2);
 		
 		mc.Outer();
-	}*/
+	}
+	
+	{
+		mc.Inner("Define complex area A");
+		
+		Node n0 = ParseExpression("abs(z-2) > abs(z-3)");
+		mc.Print("Input", n0);
+		
+		Node n1 = n0;
+		n1.Replace(Node("z"), Node("x")+Node("i")*Node("y"));
+		mc.Print("z replaced", n1);
+		
+		Node n2 = Sqrt((Real(n1[0][0])^2) + (Imag(n1[0][0])^2)) > Sqrt((Real(n1[1][0])^2) + (Imag(n1[1][0])^2));
+		mc.Print("Simplify", n2);
+		
+		Node n3 = n2;
+		n3 = n3[0][0] > n3[1][0];
+		n3.Simplify();
+		mc.Print("Solve x", n3);
+		
+		Node n4 = n3;
+		n4.Solve(Node("x"), false);
+		mc.Print("X is Re z", n4);
+		
+		Node n5 = Node("A") == Set();
+		n5[1].Add(BelongsTo(ParseExpression("z=r*e^(i*omega)"), Node("C")));
+		n5[1].Add(n4);
+		mc.Print("Area in polar coordinates", n5);
+		
+		mc.Outer();
+	}
+	
+	{
+		mc.Inner("Define complex area A");
+		
+		Node n0 = ParseExpression("abs(z^2-1) < 1");
+		mc.Print("Input", n0);
+		
+		Node n1 = n0;
+		n1.Replace(Node("z"), Node("x")+Node("i")*Node("y"));
+		mc.Print("z replaced", n1);
+		
+		Node n2 = Sqrt((Real(n1[0][0])^2) + (Imag(n1[0][0])^2)) < Node(1);
+		mc.Print("Replace x,y", n2);
+		
+		Node n3 = ParseExpression("[x=r*cos(omega),y=r*sin(omega)]");
+		mc.Print("Use", n3);
+		
+		Node n4 = n2;
+		n4.Replace(n3[0]);
+		n4.Replace(n3[1]);
+		mc.Print("Simplify", n4);
+		n4.Simplify();
+		mc.Print("Use abs(z)=1=r fact", n4);
+		
+		Node n5 = n4;
+		n5.Replace(Node("r"), Node(1));
+		mc.Print("Simplify", n5);
+		n5.Simplify();
+		mc.Print("Solve omega", n5);
+		
+		Node n6 = n5;
+		n6.SolveComplex(Node("omega"));
+		mc.Print("Answer", n6);
+		
+		mc.Outer();
+	}
 }
 
 GUI_APP_MAIN {
