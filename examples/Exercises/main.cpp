@@ -237,11 +237,146 @@ void Exercises::ComplexAnalysis1() {
 	}
 }
 
+void Exercises::ComplexAnalysis2() {
+	
+	
+	{
+		mc.Inner("Solve");
+		
+		Node n0 = ParseExpression("e^(i*z)=-1+i*sqrt(3)");
+		mc.Print("Input", n0);
+		
+		Node abs = Abs(n0[1]);
+		Node arg = Arg(n0[1]);
+		abs.Simplify();
+		arg.Simplify();
+		mc.Print("Absolute: |w| =", abs);
+		mc.Print("Arg part: arg(w) =", arg);
+		
+		Node n1 = n0[0] == (abs * (Node("e") ^ (Node("i") * arg)));
+		mc.Print("Solve z", n1);
+		
+		Node n2 = n1;
+		n2.SolveComplex(Node("z"), true);
+		mc.Print("Answer", n2);
+		
+		mc.Outer();
+	}
+	
+	{
+		mc.Inner("Solve");
+		
+		Node n0 = ParseExpression("cos(z)=2");
+		mc.Print("Input", n0);
+		
+		Node n1 = ParseExpression("cos(z)=1/2*(e^(i*z)+e^(-i*z))");
+		mc.Print("From Euler's forms", n1);
+		
+		Node n2 = n1[1] - n0[1] == 0;
+		mc.Print("Divide by e^(i*z)", n2);
+		
+		Node n3 = n2[0] / ParseExpression("e^(i*z)") == n2[1];
+		n3.Replace(Node("z"), Node("w"));
+		mc.Print("Solve w", n3);
+		n3.SolveComplex(Node("w"), true);
+		mc.Print("", n3);
+		
+		Node abs = Abs(n3[1][0]);
+		abs.Simplify();
+		mc.Print("Absolute: |w| =", abs);
+		
+		Node n4 = ParseExpression("e^(i*z)") == (abs * (Node("e") ^ (Node("i") * Node("k") * 2 * Node("pi"))));
+		mc.Print("Solve z", n4);
+		n4.SolveComplex(Node("z"), true);
+		mc.Print("Answer", n4);
+		
+		mc.Outer();
+	}
+	
+	{
+		mc.Inner("Solve");
+		
+		Node n0 = ParseExpression("i^(-2/3)");
+		mc.Print("Input", n0);
+		
+		Node abs = Abs(n0);
+		Node arg = Arg(n0);
+		abs.Simplify();
+		arg.Simplify();
+		mc.Print("Absolute: |w| =", abs);
+		mc.Print("Arg part: arg(w) =", arg);
+		
+		Node n1 = n0 == (abs * (Node("e") ^ (Node("i") * (arg + Node("k") * 2 * Node("pi") / 3))));
+		mc.Print("Calculate for k: 0,1,2,..", n1);
+		
+		for(int k = 0; k < 3; k++) {
+			Node nk1 = n1[1];
+			nk1.Replace(Node("k"), Node(k));
+			nk1.Evaluate();
+			mc.Print("Answer for k=" + IntStr(k), nk1);
+		}
+		mc.Outer();
+	}
+	
+	{
+		mc.Inner("Solve");
+		
+		Node n0 = ParseExpression("log(2+2*sqrt(3)*i)");
+		mc.Print("Input", n0);
+		
+		Node n1 = Node("z") == n0[0];
+		mc.Print("Let", n1);
+		
+		Node abs = Abs(n1[1]);
+		Node arg = Arg(n1[1]);
+		abs.Simplify();
+		arg.Simplify();
+		mc.Print("Absolute: |w| =", abs);
+		mc.Print("Arg part: arg(w) =", arg);
+		
+		Node n2 = n1[0] == Log(abs * (Node("e") ^ (Node("i") * (arg + Node("k") * 2 * Node("pi")))));
+		mc.Print("Simplify", n2);
+		n2[1].Simplify();
+		mc.Print("Answer", n2);
+		
+		mc.Outer();
+	}
+	
+	{
+		mc.Inner("Solve");
+		
+		Node n0 = ParseExpression("z = (1-i)^i");
+		mc.Print("Input", n0);
+		
+		mc.Print("Use", ParseExpression("w^i = (e^(log(w)))^i"));
+		
+		Node abs = Abs(n0[1][0]);
+		Node arg = Arg(n0[1][0]);
+		abs.Simplify();
+		arg.Simplify();
+		mc.Print("Absolute: |w| =", abs);
+		mc.Print("Arg part: arg(w) =", arg);
+		
+		Node n1 = Node("w") == (abs * (Node("e") ^ (Node("i") * (arg + Node("k") * 2 * Node("pi")))));
+		mc.Print("Place", n1);
+		
+		Node n2 = ParseExpression("(e^(log(w)))^i");
+		n2.Replace(n1);
+		mc.Print("Simplify", n2);
+		n2.Simplify();
+		mc.Print("Answer", n2);
+		
+		mc.Outer();
+	}
+	
+}
+
 GUI_APP_MAIN {
 	Exercises ue;
 	
 	//ue.HelloWorld();
-	ue.ComplexAnalysis1();
+	//ue.ComplexAnalysis1();
+	ue.ComplexAnalysis2();
 	
 	ue.mc.Refresh();
 	

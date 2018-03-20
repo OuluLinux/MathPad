@@ -18,6 +18,7 @@ public:
 	void HelloWorld();
 	
 	void ComplexAnalysis1();
+	void ComplexAnalysis2();
 	
 };
 
