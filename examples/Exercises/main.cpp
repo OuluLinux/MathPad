@@ -239,7 +239,6 @@ void Exercises::ComplexAnalysis1() {
 
 void Exercises::ComplexAnalysis2() {
 	
-	
 	{
 		mc.Inner("Solve");
 		
@@ -364,6 +363,60 @@ void Exercises::ComplexAnalysis2() {
 		n2.Replace(n1);
 		mc.Print("Simplify", n2);
 		n2.Simplify();
+		mc.Print("Answer", n2);
+		
+		mc.Outer();
+	}
+	
+	{
+		mc.Inner("Get real and imaginary parts");
+		
+		Node n0 = ParseExpression("f(z)=z^3");
+		mc.Print("Input", n0);
+		
+		n0[1].Replace(Node("z"), ParseExpression("x+i*y"));
+		mc.Print("Input", n0);
+		
+		Node re = Real(n0[1]);
+		Node im = Imag(n0[1]);
+		mc.Print("Real part", re);
+		mc.Print("Imaginary part", im);
+		
+		mc.Outer();
+	}
+	
+	{
+		mc.Inner("Define complex function f(z)");
+		
+		Node in0 = ParseExpression("u(x,y)=x^2+x-y^2");
+		Node in1 = ParseExpression("v(x,y)=2*x*y-y");
+		mc.Print("Input", in0);
+		mc.Print("Input", in1);
+		
+		Node x = ParseExpression("x = 1/2*(z+zv)");
+		Node y = ParseExpression("y = 1/(2*i)*(z+zv)");
+		mc.Print("Real part", x);
+		mc.Print("Imag part", y);
+		
+		Node n0 = in0;
+		n0[1].Replace(x);
+		n0[1].Replace(y);
+		mc.Print("Simplify", n0);
+		n0[1].Simplify();
+		mc.Print("u", n0);
+		
+		Node n1 = in1;
+		n1[0] = Node("i") * n1[0];
+		n1[1] = Node("i") * n1[1];
+		n1[1].Replace(x);
+		n1[1].Replace(y);
+		mc.Print("Simplify", n1);
+		n1[1].Simplify();
+		mc.Print("v", n1);
+		
+		Node n2 = ParseExpression("f(z)") == (n0[1] + n1[1]);
+		mc.Print("Simplify", n2);
+		n2[1].Simplify();
 		mc.Print("Answer", n2);
 		
 		mc.Outer();
