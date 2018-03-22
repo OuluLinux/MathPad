@@ -422,6 +422,123 @@ void Exercises::ComplexAnalysis2() {
 		mc.Outer();
 	}
 	
+	{
+		mc.Inner("Form a picture of unit square with function f(z)=z^2");
+		
+		Node input = ParseExpression("f(z)=z^2");
+		mc.Print("Input", input);
+		
+		Node z = ParseExpression("z=x+i*y");
+		Node n0 = input;
+		n0.Replace(z);
+		mc.Print("Input", n0);
+		
+		Node n1 = ParseExpression("f(z)=u(x,y)+i*v(x,y)");
+		mc.Print("Input", n1);
+		
+		for(int i = 0; i < 4; i++) {
+			Node x, y, f = n0, u, v;
+			switch(i) {
+				case 0:
+					x = BelongsTo(Node("x"), Range(0,1,1,1));
+					y = Node("y") == 0;
+					f.Replace(Node("y"), Node(0));
+					break;
+				case 1:
+					y = BelongsTo(Node("y"), Range(0,1,1,1));
+					x = Node("x") == 0;
+					f.Replace(Node("x"), Node(0));
+					break;
+				case 2:
+					x = BelongsTo(Node("x"), Range(0,1,1,1));
+					y = Node("y") == 1;
+					f.Replace(Node("y"), Node(1));
+					break;
+				case 3:
+					y = BelongsTo(Node("y"), Range(0,1,1,1));
+					x = Node("x") == 1;
+					f.Replace(Node("x"), Node(1));
+					break;
+			}
+			
+			mc.Print("Side " + IntStr(i) + " x", x);
+			mc.Print("Side " + IntStr(i) + " y", y);
+			mc.Print("Side " + IntStr(i) + " f", f);
+			f[1].Simplify();
+			mc.Print("Side " + IntStr(i) + " f", f);
+			
+			u = ParseExpression("u(x,y)") == Real(f[1]);
+			v = ParseExpression("v(x,y)") == Imag(f[1]);
+			mc.Print("Side " + IntStr(i) + " v", v);
+			mc.Print("Side " + IntStr(i) + " u", u);
+				
+		}
+		mc.Outer();
+	}
+	
+	{
+		mc.Inner("Show parametric form of a line segment AB function");
+		
+		Node a = ParseExpression("A=1+i");
+		Node b = ParseExpression("B=2+2*i");
+		Node f = ParseExpression("f(z)=e^z");
+		mc.Print("Input", a);
+		mc.Print("Input", b);
+		mc.Print("Input", f);
+		
+		Node n0 = Node("B") - Node("A") == b[1] - a[1];
+		mc.Print("Calculate", n0);
+		n0[1].Simplify();
+		
+		Node n1 = Node("AB") == Node("A") + Node("c") * n0[1];
+		mc.Print("Equation for dots", Set().Add(n1).Add(BelongsTo(Node("c"), Range(0,1,1,1))));
+		
+		Node n2 = ParseExpression("c=t/(2*pi)");
+		mc.Print("Polar conversion", n2);
+		
+		Node n3 = n1;
+		n3.Replace(n2);
+		n3.Replace(a);
+		mc.Print("Conversed", n3);
+		
+		Node n4 = f;
+		n4[0].Replace(Node("z"), n3[0]);
+		n4[1].Replace(Node("z"), n3[1]);
+		mc.Print("Answer", n4);
+		
+		mc.Outer();
+	}
+	
+	{
+		for(int i = 0; i < 2; i++) {
+			mc.Inner("Is polynome analytical polynome");
+			
+			Node in;
+			if (i == 0) in = ParseExpression("P(x,y)=x^2-y^2+2*x*y*i");
+			else in = ParseExpression("Q(x,y)=x^2+y^2-2*x*y*i");
+			mc.Print("Input", in);
+			
+			Node x = ParseExpression("x = 1/2*(z+zv)");
+			Node y = ParseExpression("y = 1/(2*i)*(z+zv)");
+			mc.Print("Real part", x);
+			mc.Print("Imag part", y);
+			
+			Node n0 = in;
+			n0[1].Replace(x);
+			n0[1].Replace(y);
+			mc.Print("Simplify", n0);
+			
+			n0[1].Simplify();
+			mc.Print("Simplify", n0);
+			
+			if (!n0[1].Compare(ParseExpression("(z+zv)^2")))
+				mc.Print("Answer", Node("Yes"));
+			else
+				mc.Print("Answer", Node("No"));
+			mc.Outer();
+		}
+	}
+	
 }
 
 GUI_APP_MAIN {
