@@ -511,7 +511,7 @@ void Exercises::ComplexAnalysis2() {
 	
 	{
 		for(int i = 0; i < 2; i++) {
-			mc.Inner("Is polynome analytical polynome");
+			mc.Inner("Is analytical polynome");
 			
 			Node in;
 			if (i == 0) in = ParseExpression("P(x,y)=x^2-y^2+2*x*y*i");
@@ -541,12 +541,254 @@ void Exercises::ComplexAnalysis2() {
 	
 }
 
+void Exercises::ComplexAnalysis3() {
+	
+	{
+		for(int i = 0; i < 3; i++) {
+			mc.Inner("Is analytical polynome");
+			
+			Node in;
+			if      (i == 0) in = ParseExpression("f(z)=x^2-y^2+2*x+i*(2*x*y+2*y)");
+			else if (i == 1) in = ParseExpression("f(z)=x^3-3*x*y^2+i*(3*(x^2)*y-y^3)");
+			else if (i == 2) in = ParseExpression("f(z)=cos(x+i*y)");
+			mc.Print("Input", in);
+			
+			Node n0 = Set().Add(FunctionDerive(Node("u"), Node("x")) == FunctionDerive(Node("v"), Node("y"))).Add(FunctionDerive(Node("u"), Node("y")) == -1 * FunctionDerive(Node("v"), Node("x")));
+			mc.Print("Cauchy-Riemann rule for analytical polynomes", n0);
+			
+			Node u = Real(in[1]);
+			Node v = Imag(in[1]);
+			mc.Print("Real part: u", u);
+			mc.Print("Imag part: v", v);
+			
+			Node n1a = Derive(u, Node("x"));
+			Node n1b = Derive(v, Node("y"));
+			mc.Print("u derived by x", n1a);
+			mc.Print("y derived by y", n1b);
+			bool a_part_true = TestEqual(n1a, n1b);
+			
+			if (a_part_true)
+				mc.Print("Is Equal", Node("Yes"));
+			else
+				mc.Print("Is Equal", Node("No"));
+			
+			Node n2a = Derive(u, Node("y"));
+			Node n2b = Derive(v, Node("x"));
+			mc.Print("u derived by y", n2a);
+			mc.Print("y derived by x", n2b);
+			bool b_part_true = TestEqual(n2a, n2b * -1);
+			
+			if (b_part_true)
+				mc.Print("Is (-1*) Equal", Node("Yes"));
+			else
+				mc.Print("Is Equal", Node("No"));
+			
+			bool is_analytical = a_part_true && b_part_true;
+			if (is_analytical)
+				mc.Print("Is analytical", Node("Yes"));
+			else
+				mc.Print("Is analytical", Node("No"));
+			
+			
+			if (is_analytical) {
+				
+				Node n3 = Derive(u, Node("x")) + Node("i") * Derive(v, Node("x"));
+				mc.Print("Derived. Simplify.", n3);
+				
+				n3.Simplify();
+				mc.Print("Answer", n3);
+				
+			}
+			
+			mc.Outer();
+		}
+	}
+	
+	{
+		mc.Inner("Is harmonic polynome");
+		
+		Node in = ParseExpression("u(x,y)=y^3-3*x^2*y");
+		mc.Print("Input", in);
+		
+		Node n0 = FunctionDerive(Node("u"), Pow2(Node("y"))) == -1 * FunctionDerive(Node("u"), Pow2(Node("x")));
+		mc.Print("Rule for harmonic function", n0);
+	
+		Node u = in[1];
+		
+		Node n2a = Derive(Derive(u, Node("y")), Node("y"));
+		Node n2b = Derive(Derive(u, Node("x")), Node("x"));
+		mc.Print("u derived by y^2", n2a);
+		mc.Print("y derived by x^2", n2b);
+		bool is_harmonic = TestEqual(n2a, n2b * -1);
+		
+		if (is_harmonic)
+			mc.Print("Is harmonic", Node("Yes"));
+		else
+			mc.Print("Is harmonic", Node("No"));
+		
+		
+		if (is_harmonic) {
+			
+			Node n3 = Integrate(Derive(u, Node("y")), Node("y")) - Node("i") * Integrate(Derive(u, Node("x")), Node("x")) + Node("C");
+			mc.Print("Simplify", n3);
+			
+			n3.Simplify();
+			mc.Print("Simplify", n3);
+		}
+		
+		mc.Outer();
+	}
+	
+	{
+		mc.Inner("Conformity of function f(z)=z^2");
+		
+		Node f = ParseExpression("f(z)=z^2");
+		Node z0 = ParseExpression("z_0=1+2*i");
+		Node t0 = Real(z0[1]);
+		Node t1 = Imag(z0[1]);
+		Node c1 = ParseExpression("c_1=1+i*t");
+		Node c2 = ParseExpression("c_2=t+2*t*i");
+		
+		mc.Print("f", f);
+		mc.Print("intersection z0", z0);
+		mc.Print("t1", t0);
+		mc.Print("t2", t1);
+		mc.Print("c1", c1);
+		mc.Print("c2", c2);
+		
+		Node d1a = f;
+		d1a[1].Replace(Node("z"), c1[1]);
+		mc.Print("d1 Simplify", d1a);
+		d1a[1].Simplify();
+		mc.Print("d1", d1a);
+		
+		Node d2a = f;
+		d2a[1].Replace(Node("z"), c2[1]);
+		mc.Print("d2 Simplify", d2a);
+		d2a[1].Simplify();
+		mc.Print("d2", d2a);
+		
+		Node c1d = Derive(c1[1], Node("t"));
+		mc.Print("c1 derived", c1d);
+		Node c2d = Derive(c2[1], Node("t"));
+		mc.Print("c2 derived", c2d);
+		Node d1d = Derive(d1a[1], Node("t"));
+		mc.Print("d1 derived", d1d);
+		Node d2d = Derive(d2a[1], Node("t"));
+		mc.Print("d2 derived", d2d);
+		
+		Node c1dt = c1d;
+		c1dt.Replace(Node("t"), t1);
+		mc.Print("c1 derived t2: simplify", c1dt);
+		c1dt.Simplify();
+		Node c1dt_abs = Abs(c1dt);
+		mc.Print("c1 derived t2 abs", c1dt_abs);
+		Node c1dt_arg = Arg(c1dt);
+		mc.Print("c1 derived t2 arg", c1dt_arg);
+		
+		Node d1dt = d1d;
+		d1dt.Replace(Node("t"), t1);
+		mc.Print("d1 derived t2: simplify", d1dt);
+		d1dt.Simplify();
+		Node d1dt_abs = Abs(d1dt);
+		mc.Print("d1 derived t2 abs", d1dt_abs);
+		d1dt_abs.Simplify();
+		mc.Print("d1 derived t2 abs", d1dt_abs);
+		Node d1dt_arg = Arg(d1dt);
+		mc.Print("d1 derived t2 arg", d1dt_arg);
+		
+		mc.Print("abs derived d1 t2 == r * abs derived c1 t2", Node());
+		mc.Print("arg derived d1 t2 == r * arg derived c1 t2 + omega", Node());
+		
+		Node c2dt = c2d;
+		c2dt.Replace(Node("t"), t0);
+		mc.Print("c2 derived t1: simplify", c2dt);
+		c2dt.Simplify();
+		Node c2dt_abs = Abs(c2dt);
+		mc.Print("c2 derived t1 abs", c2dt_abs);
+		Node c2dt_arg = Arg(c2dt);
+		mc.Print("c2 derived t1 arg", c2dt_arg);
+		
+		Node d2dt = d2d;
+		d2dt.Replace(Node("t"), t0);
+		mc.Print("d2 derived t1: simplify", d2dt);
+		d2dt.Simplify();
+		Node d2dt_abs = Abs(d2dt);
+		mc.Print("d2 derived t1 abs", d2dt_abs);
+		d2dt_abs.Simplify();
+		mc.Print("d2 derived t1 abs", d2dt_abs);
+		Node d2dt_arg = Arg(d2dt);
+		mc.Print("d2 derived t1 arg", d2dt_arg);
+		
+		mc.Print("abs derived d2 t1 == r * abs derived c2 t1", Node());
+		mc.Print("arg derived d2 t1 == r * arg derived c2 t1 + omega", Node());
+				
+		mc.Outer();
+	}
+	
+	{
+		mc.Inner("Conformity of function f(z)=z^2");
+		
+		Node in = ParseExpression("f(z)=z+1/z");
+		mc.Print("Input", in);
+		
+		Node n0 = in;
+		n0.Replace(Node("z"), ParseExpression("x+i*y"));
+		
+		Node u = Real(n0[1]);
+		Node v = Imag(n0[1]);
+		mc.Print("Real part: u", u);
+		mc.Print("Imag part: v", v);
+		
+		Node n1 = Set().Add(FunctionDerive(Node("u"), Node("x")) == FunctionDerive(Node("v"), Node("y"))).Add(FunctionDerive(Node("u"), Node("y")) == -1 * FunctionDerive(Node("v"), Node("x")));
+		mc.Print("Cauchy-Riemann rule for analytical polynomes", n1);
+		
+		Node udx = u;
+		udx.Derive(Node("x"));
+		mc.Print("u derived by x", udx);
+		
+		Node vdy = v;
+		vdy.Derive(Node("y"));
+		mc.Print("v derived by y", vdy);
+		
+		if (TestEqual(udx, vdy)) mc.Print("They are equal", Node(""));
+		else mc.Print("They are not equal", Node(""));
+		
+		Node udy = u;
+		udy.Derive(Node("y"));
+		mc.Print("u derived by y", udy);
+		
+		Node vdx = v;
+		vdx.Derive(Node("x"));
+		mc.Print("v derived by x", vdx);
+		
+		if (TestEqual(udy, -1 * vdx)) mc.Print("They are -1* equal", Node(""));
+		else mc.Print("They are not -1* equal", Node(""));
+		
+		Node n2 = DeriveFunction(in, Node("z"));
+		mc.Print("Input derived", n2);
+		Node n3 = n2[1] == 0;
+		mc.Print("Solve z", n3);
+		n3.Solve(Node("z"));
+		mc.Print("Does conform everywhere except in points", n3);
+		
+		Node n4 = v == Node("d");
+		mc.Print("Function of current is ", n4);
+		
+		mc.Outer();
+	}
+	
+	
+}
+
+		
 GUI_APP_MAIN {
 	Exercises ue;
 	
 	//ue.HelloWorld();
 	//ue.ComplexAnalysis1();
-	ue.ComplexAnalysis2();
+	//ue.ComplexAnalysis2();
+	ue.ComplexAnalysis3();
 	
 	ue.mc.Refresh();
 	
