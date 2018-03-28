@@ -20,6 +20,7 @@ public:
 	void ComplexAnalysis1();
 	void ComplexAnalysis2();
 	void ComplexAnalysis3();
+	void ComplexAnalysis4();
 	
 };
 

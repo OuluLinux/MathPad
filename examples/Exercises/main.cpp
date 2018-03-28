@@ -781,14 +781,214 @@ void Exercises::ComplexAnalysis3() {
 	
 }
 
+void Exercises::ComplexAnalysis4() {
+	
+	{
+		mc.Inner("Integrate");
 		
+		Node in = ParseExpression("(z+2)/z");
+		mc.Print("Input", in);
+		
+		Node z = in * Node("z") * Node("i");
+		z.Replace(Node("z"), ParseExpression("2*e^(i*OMEGA)"));
+		
+		Node n0 = FunctionIntegrate(z, Node("OMEGA"), Node(0), Node("pi"));
+		mc.Print("Integrate", n0);
+		
+		Node n1 = FunctionIntegrateUnplace(z, Node("OMEGA"), Node(0), Node("pi"));
+		mc.Print("Integrated", n1);
+		
+		Node n2 = Integrate(z, Node("OMEGA"), Node(0), Node("pi"));
+		mc.Print("Integrated", n2);
+		
+		
+		mc.Outer();
+	}
+	
+	for(int i = 0; i < 2; i++) {
+		mc.Inner("Integrate");
+		
+		Node in = ParseExpression("f(z)=y+i*x^3");
+		mc.Print("Input", in);
+		
+		Node zt;
+		if (i == 0) zt = ParseExpression("z(t)=t-i*t^2");
+		if (i == 1) zt = ParseExpression("z(t)=t-2*t*i");
+		mc.Print("Input", zt);
+		
+		Node ztd = zt[1];
+		ztd.Derive(Node("t"));
+		mc.Print("Derived input", ztd);
+		
+		Node x = Real(zt[1]);
+		Node y = Imag(zt[1]);
+		mc.Print("Real part: x", x);
+		mc.Print("Imag part: y", y);
+		
+		Node ft = in[1] * ztd;
+		ft.Replace(Node("x"), x);
+		ft.Replace(Node("y"), y);
+		
+		Node n0 = FunctionIntegrate(ft, Node("t"), Node(0), Node(2));
+		mc.Print("Integrate", n0);
+		
+		Node n1 = FunctionIntegrateUnplace(ft, Node("t"), Node(0), Node(2));
+		mc.Print("Integrated", n1);
+		
+		Node n2 = Integrate(ft, Node("t"), Node(0), Node(2));
+		mc.Print("Integrated", n2);
+		
+		mc.Outer();
+	}
+	
+	{
+		mc.Inner("Integrate");
+		
+		Node in = ParseExpression("f(z)=z^i");
+		mc.Print("Input", in);
+		
+		Node zt = ParseExpression("z(t)=e^(i*t)");
+		mc.Print("Input", zt);
+		
+		Node branch = ParseExpression("z^i=e^(i*log(t))");
+		mc.Print("Input", branch);
+		
+		Node ztd = zt[1];
+		ztd.Derive(Node("t"));
+		mc.Print("Derived input", ztd);
+		
+		Node ft = branch[1]  * ztd;
+		
+		Node n0 = FunctionIntegrate(ft, Node("t"), Node(0), Node("pi"));
+		mc.Print("Integrate", n0);
+		
+		Node n1 = FunctionIntegrateUnplace(ft, Node("t"), Node(0), Node("pi"));
+		mc.Print("Integrated", n1);
+		
+		Node n2 = Integrate(ft, Node("t"), Node(0), Node("pi"));
+		mc.Print("Integrated", n2);
+		
+		mc.Outer();
+	}
+	
+	{
+		mc.Inner("Integrate");
+		
+		Node in = ParseExpression("z/(z^2+9)");
+		mc.Print("Input", in);
+		
+		Node z = ParseExpression("abs(z)=2");
+		mc.Print("Input", z);
+		
+		Node theory = ParseExpression("1/(2*pi*i)*integrate(f(z)/(z-z_0), z)");
+		mc.Print("Cauchy's form", theory);
+		
+		Node z0 = ParseExpression("z_0=sqrt(-9)");
+		mc.Print("Simplify", z0);
+		z0[1].Simplify();
+		mc.Print("Radius", z0);
+		
+		mc.Print("Answer: area it outside of the circle", Node(0));
+		
+		mc.Outer();
+	}
+	
+	{
+		mc.Inner("Integrate");
+		
+		Node in = ParseExpression("z/(z^2+9)");
+		mc.Print("Input", in);
+		
+		Node z = ParseExpression("abs(z)=4");
+		mc.Print("Input", z);
+		
+		Node theory = ParseExpression("1/(2*pi*i)*integrate(f(z)/(z-z_0), z)");
+		mc.Print("Cauchy's form", theory);
+		
+		Node z0 = ParseExpression("z_0=sqrt(-9)");
+		mc.Print("Simplify", z0);
+		z0[1].Simplify();
+		mc.Print("Radius", z0);
+		
+		Node n0a = ParseExpression("A/(z+3*i)+B/(z-3*i)");
+		Node n0 = n0a - in;
+		mc.Print("Solve A, B", n0);
+		
+		Node u = Real(n0);
+		Node v = Imag(n0);
+		u.Simplify();
+		v.Simplify();
+		mc.Print("Real part: u", u);
+		mc.Print("Imag part: v", v);
+		
+		Node n1 = LinearSolve(Set().Add(u).Add(v), Set().Add(Node("A")).Add(Node("B")));
+		mc.Print("A,B", n1);
+		
+		Node n2 = n0a;
+		n2.Replace(Node("A"), n1[0]);
+		n2.Replace(Node("B"), n1[1]);
+		
+		Node n3 = FunctionIntegrate(n2, Node("z"));
+		mc.Print("Integrate", n3);
+		
+		Node n4 = ParseExpression("2*pi*i*f(3*i)+2*pi*i*f(-3*i)");
+		mc.Print("Integrated", n4);
+		
+		Node n5 = ParseExpression("2*pi*i*(1/2 + 1/2)");
+		mc.Print("Answer", n5);
+		
+		mc.Outer();
+	}
+	
+	{
+		mc.Inner("Integrate");
+		
+		Node in = ParseExpression("integrate((4*z*sin(z))/(z^2+2*i*z+3), z)");
+		mc.Print("Input", in);
+		
+		Node n0 = in[0][1] == 0;
+		mc.Print("Solve z", n0);
+		
+		Node n1 = n0;
+		n1.SolveComplex(Node("z"), true);
+		mc.Print("", n1);
+		
+		Node n2 =  ParseExpression("A/(z-z_0)+B/(z-z_1)-(4*z)/(z^2+2*i*z+3)");
+		n2.Replace(Node("z_0"), n1[1][0]);
+		n2.Replace(Node("z_1"), n1[1][1]);
+		mc.Print("Solve A, B", n2);
+		
+		Node u = Real(n2);
+		Node v = Imag(n2);
+		u.Simplify();
+		v.Simplify();
+		mc.Print("Real part: u", u);
+		mc.Print("Imag part: v", v);
+		
+		Node n3 = LinearSolve(Set().Add(u).Add(v), Set().Add(Node("A")).Add(Node("B")));
+		mc.Print("A,B", n3);
+		
+		Node n4 = ParseExpression("integrate((3*sin(z))/(z+3*i)+(sin(z))/(z-i), z)");
+		mc.Print("First part is zero. It's is outside of circle.", n4);
+		
+		Node n5 = ParseExpression("integrate((sin(z))/(z-i), z)=2*pi*i*sin(i)");
+		mc.Print("Answer", n5);
+		
+		
+		mc.Outer();
+	}
+	
+	
+}
+
 GUI_APP_MAIN {
 	Exercises ue;
 	
 	//ue.HelloWorld();
 	//ue.ComplexAnalysis1();
 	//ue.ComplexAnalysis2();
-	ue.ComplexAnalysis3();
+	//ue.ComplexAnalysis3();
+	ue.ComplexAnalysis4();
 	
 	ue.mc.Refresh();
 	
