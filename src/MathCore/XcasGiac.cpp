@@ -39,49 +39,49 @@ String RunCommand(String in) {
 Node Eliminate(Node list, Node var) {
 	String giac_cmd = "eliminate(" + list.AsInlineString() + "," + var.AsDataInlineString() + ")";
     Node out = ParseExpression(RunCommand(giac_cmd));
-    if (out.IsArray() && out.GetCount() == 1) out = out[0];
+    if (out.IsArray() && out.GetCount() == 1) return out[0];
     return out;
 }
 
 Node Solve(Node n) {
 	String giac_cmd = "solve(" + n.AsInlineString() + ")";
     Node out = ParseExpression(RunCommand(giac_cmd));
-    if (out.IsArray() && out.GetCount() == 1) out = out[0];
+    if (out.IsArray() && out.GetCount() == 1) return out[0];
     return out;
 }
 
 Node SolveComplex(Node n) {
 	String giac_cmd = "csolve(" + n.AsInlineString() + ")";
     Node out = ParseExpression(RunCommand(giac_cmd));
-    if (out.IsArray() && out.GetCount() == 1) out = out[0];
+    if (out.IsArray() && out.GetCount() == 1) return out[0];
     return out;
 }
 
 Node FSolve(Node n) {
 	String giac_cmd = "fsolve(" + n.AsInlineString() + ")";
     Node out = ParseExpression(RunCommand(giac_cmd));
-    if (out.IsArray() && out.GetCount() == 1) out = out[0];
+    if (out.IsArray() && out.GetCount() == 1) return out[0];
     return out;
 }
 
 Node SolveVar(Node expr, Node key) {
 	String giac_cmd = "solve(" + expr.AsInlineString() + ", " + key.AsInlineString() + ")";
     Node out = ParseExpression(RunCommand(giac_cmd));
-    if (out.IsArray() && out.GetCount() == 1) out = out[0];
+    if (out.IsArray() && out.GetCount() == 1) return out[0];
     return out;
 }
 
 Node SolveComplexVar(Node expr, Node key) {
 	String giac_cmd = "csolve(" + expr.AsInlineString() + ", " + key.AsInlineString() + ")";
     Node out = ParseExpression(RunCommand(giac_cmd));
-    if (out.IsArray() && out.GetCount() == 1) out = out[0];
+    if (out.IsArray() && out.GetCount() == 1) return out[0];
     return out;
 }
 
 Node FSolveVar(Node expr, Node key) {
 	String giac_cmd = "fsolve(" + expr.AsInlineString() + ", " + key.AsInlineString() + ")";
     Node out = ParseExpression(RunCommand(giac_cmd));
-    if (out.IsArray() && out.GetCount() == 1) out = out[0];
+    if (out.IsArray() && out.GetCount() == 1) return out[0];
     return out;
 }
 
@@ -129,6 +129,7 @@ Node Floating(Node n) {
 		return Int(0);
 	}
 	String giac_cmd = "float(" + n.AsInlineString() + ")";
+	LOG(giac_cmd);
     String hotfix = RunCommand(giac_cmd);
     hotfix.Replace(",",".");
     return ParseExpression(hotfix);
@@ -451,6 +452,11 @@ Node Real(Node n) {
 
 Node Imag(Node n) {
 	String giac_cmd = "imag(" + n.AsInlineString() + ")";
+    return ParseExpression(RunCommand(giac_cmd));
+}
+
+Node Arg(Node n) {
+	String giac_cmd = "arg(" + n.AsInlineString() + ")";
     return ParseExpression(RunCommand(giac_cmd));
 }
 

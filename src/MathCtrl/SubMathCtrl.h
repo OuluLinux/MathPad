@@ -207,6 +207,7 @@ private:
 	SubMathCtrl Sumat(SubMathCtrl &data, SubMathCtrl &sub, SubMathCtrl &sup);
 	SubMathCtrl Sumat(Node expr, Node key, Node begin, Node end);
 	SubMathCtrl Limit(Node expr, Node key, Node limit);
+	SubMathCtrl Residy(Node expr, Node key, Node limit);
 	SubMathCtrl Exp(SubMathCtrl &data, SubMathCtrl &exp);
 	SubMathCtrl Function(String function, SubMathCtrl &content);
 	SubMathCtrl Equal(SubMathCtrl &left, SubMathCtrl &right);

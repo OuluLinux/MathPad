@@ -33,6 +33,7 @@ void InitBuiltinFunctions() {
 	builtin_funcs.Add("log", FUNC_LOG);
 	builtin_funcs.Add("sum", FUNC_SUM);
 	builtin_funcs.Add("limit", FUNC_LIMIT);
+	builtin_funcs.Add("residy", FUNC_RESIDY);
 	builtin_funcs.Add("plusmin", FUNC_PLUSMIN);
 	builtin_funcs.Add("exp", FUNC_EXP);
 }
@@ -146,6 +147,9 @@ Node Term(CParser& p)
 		String value = out.GetString();
 		if (value.GetCount()) {
 			int func = builtin_funcs.Find(value);
+			if (func == 16) {
+				LOG("");
+			}
 			if (func != -1) {
 				func = builtin_funcs[func];
 				out.SetFunction(func);
@@ -162,12 +166,13 @@ Node Term(CParser& p)
 			//LOG(out.AsString());
 			//LOG(out.AsInlineString());
 			int chr = *p.GetPtr();
-			if(p.Char(',')) 
+			if(p.Char(','))
 				;
 			if(p.IsId("and")) {
 				p.ReadId();
 			}
 		}
+		//LOG(out.AsString());
 		p.Char(')');
 	} 
 	else if(p.Char('[')) {
@@ -553,7 +558,7 @@ Node ParseExpression(const String& expr) {
 		//LOG(out.AsString());
 		//LOG(out.AsInlineString());
 		out.Trim();
-		out.Normalize();
+		//out.Normalize();
 		//LOG(out.AsString());
 		//LOG(out.AsInlineString());
 		return out;

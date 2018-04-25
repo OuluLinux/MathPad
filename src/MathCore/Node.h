@@ -33,10 +33,10 @@ enum {
 };
 
 enum {
-	FUNC_ABS, FUNC_LENGTH, FUNC_CONJUGATE,FUNC_DERIVE,
+	FUNC_UNKNOWN, FUNC_ABS, FUNC_LENGTH, FUNC_CONJUGATE,FUNC_DERIVE,
 	FUNC_INTEGRATE, FUNC_INTEGRATED_UNPLACED,
 	FUNC_SIN, FUNC_COS, FUNC_TAN, FUNC_ASIN, FUNC_ACOS, FUNC_ATAN,
-	FUNC_SIGNMAP, FUNC_SUM, FUNC_LIMIT,
+	FUNC_SIGNMAP, FUNC_SUM, FUNC_LIMIT, FUNC_RESIDY,
 	FUNC_PLUSMIN,
 	FUNC_SQRT, FUNC_POW, FUNC_EXP,
 	FUNC_FACTORIAL, FUNC_BINCOEFF,
@@ -148,6 +148,7 @@ public:
 	//Node DeepCopy();
 	Node& Add();
 	Node& Add(const Node& m);
+	Node& AddId(String s) {return Add(Node(s));}
 	Node& Insert(int pos, Node n);
 	/*Node Print(String title);
 	Node Print(const char* title);
@@ -156,17 +157,19 @@ public:
 	Node PrintLower(String title) {return Print(title, true);}*/
 	Node& Floating();
 	Node& Solve();
-	Node& Solve(Node key, bool keep_key_equality=false);
+	Node& Solve(String key, bool keep_equal_expr=false) {return Solve(Node(key), keep_equal_expr);}
+	Node& Solve(Node key, bool keep_equal_expr=false);
 	Node& SolveComplex();
-	Node& SolveComplex(const Node key, bool keep_key_equality=false);
+	Node& SolveComplex(const Node key, bool keep_equal_expr=false);
 	Node& FSolve();
-	Node& FSolve(Node key, bool keep_key_equality=false);
+	Node& FSolve(Node key, bool keep_equal_expr=false);
 	Node& Simplify();
 	Node& Calculate();
 	Node& Factor();
 	Node& TypeSimplify();
 	Node& Parse(const String& expr);
-	Node& Replace(Node& find, const Node replacing);
+	Node& Replace(String id, const Node& replacing) {return Replace(Node(id), replacing);}
+	Node& Replace(Node& find, const Node& replacing);
 	Node& Replace(Node& equation);
 	Node& ReplaceEq(const Node equation) {return ReplaceEq(equation);}
 	Node& Remove(Node* node);
@@ -376,6 +379,7 @@ inline Node FunctionIntegrateRange(Node in0, Node key, Node begin, Node end) {re
 Node FunctionIntegrateUnplace(Node in0, Node key, Node begin, Node end);
 Node FunctionSum(Node expr, Node var, Node begin, Node end);
 Node FunctionLimit(Node expr, Node var, Node limit);
+Node FunctionResidy(Node expr, Node var, Node limit);
 Node FunctionProbability(String id);
 Node FunctionProbability(Node n);
 Node Prob(const String& id);

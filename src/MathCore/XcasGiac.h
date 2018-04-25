@@ -59,6 +59,7 @@ Node Factor(Node n);
 Node Sum(Node expr, Node var, Node begin, Node end);
 Node Real(Node n);
 Node Imag(Node n);
+Node Arg(Node n);
 
 Node ExpTrig(Node exp);
 Node SolveDifferentialEquation(Node expr, Node var);

@@ -179,6 +179,26 @@ extern Node IdWaveFunction;
 extern Node IdAngularPrecessionVelocity;
 extern Node IdSolidAngle;
 
+extern Node SpeedOfLightVacuum;
+extern Node GravitationalConstant;
+extern Node PlanckConstant;
+extern Node ElementaryCharge;
+extern Node ElectricConstant;
+extern Node MagneticConstant;
+extern Node AvogadroConstant;
+extern Node BoltzmannConstant;
+extern Node GasConstant;
+extern Node SetfanBoltzmannConstant;
+extern Node WienDisplacementConstant;
+extern Node AtomicMassConstant;
+extern Node ElectronMass;
+extern Node ProtonMass;
+extern Node NeutronMass;
+extern Node LuminousEfficacy;
+extern Node StandardGravity;
+extern Node StandardAtmosphere;
+extern Node HubbleConstant;
+extern Node VacuumPermittivity;
 
 }
 

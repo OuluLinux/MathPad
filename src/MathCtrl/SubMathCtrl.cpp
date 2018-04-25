@@ -781,6 +781,17 @@ SubMathCtrl SubMathCtrl::Limit(Node expr, Node key, Node limit) {
 	return JoinCenter(left, right);
 }
 
+SubMathCtrl SubMathCtrl::Residy(Node expr, Node key, Node limit) {
+	SubMathCtrl top = Text("Res", TYPE_FUNCTION, false, 0, 0);
+	SubMathCtrl bottom_left = Exp(key, true);
+	SubMathCtrl bottom_middle = Text("\342\206\222", TYPE_OP);
+	SubMathCtrl bottom_right = Exp(limit, true);
+	SubMathCtrl bottom = JoinTriple(bottom_left, bottom_middle, bottom_right);
+	SubMathCtrl left = JoinVert(top, bottom, true);
+	SubMathCtrl right = Exp(expr, false);
+	return JoinCenter(left, right);
+}
+
 SubMathCtrl SubMathCtrl::Exp(SubMathCtrl &data, SubMathCtrl &exp)
 {
 	SubMathCtrl foo = Text("", TYPE_OTHER);
@@ -1058,13 +1069,13 @@ SubMathCtrl SubMathCtrl::Exp(Node& n, bool nobrackets)
 	}
 	else if (type == TYPE_FUNCTION) {
 		int func = n.GetInt();
-		String value;
+		String value = n.GetFunctionName();
 		int count = n.GetCount();
 		if(func == FUNC_INTEGRATE && (count == 2 || count == 4)) {
 			if (count == 4) {
 				SubMathCtrl data	= Exp(n[0], true);
 				SubMathCtrl key		= Exp(n[1], true);
-				SubMathCtrl keyd 	= Text("d", TYPE_FUNCTION, 0,0,0, n);
+				SubMathCtrl keyd	= Text("d", TYPE_FUNCTION, 0,0,0, n);
 				key = JoinBottom(keyd, key);
 				SubMathCtrl sub		= Exp(n[2], true);
 				SubMathCtrl sup		= Exp(n[3], true);
@@ -1072,7 +1083,7 @@ SubMathCtrl SubMathCtrl::Exp(Node& n, bool nobrackets)
 			} else {
 				SubMathCtrl data	= Exp(n[0], true);
 				SubMathCtrl key		= Exp(n[1], true);
-				SubMathCtrl keyd 	= Text("d", TYPE_FUNCTION, 0,0,0, n);
+				SubMathCtrl keyd	= Text("d", TYPE_FUNCTION, 0,0,0, n);
 				key = JoinBottom(keyd, key);
 				data = Bracket(data);
 				SubMathCtrl right = JoinBottom(data, key);
@@ -1089,7 +1100,7 @@ SubMathCtrl SubMathCtrl::Exp(Node& n, bool nobrackets)
 		}
 		else if (func == FUNC_SQRT) {
 			REQUIRE_ARGS(n, 1);
-			SubMathCtrl x 		= Exp(n[0], true);
+			SubMathCtrl x		= Exp(n[0], true);
 			return Sqrt(x).SetSource(n);
 		}
 		else if (func == FUNC_FACTORIAL) {
@@ -1115,6 +1126,10 @@ SubMathCtrl SubMathCtrl::Exp(Node& n, bool nobrackets)
 		else if (func == FUNC_LIMIT) {
 			REQUIRE_ARGS(n, 3);
 			return Limit(n[0], n[1], n[2]).SetSource(n);
+		}
+		else if (func == FUNC_RESIDY) {
+			REQUIRE_ARGS(n, 3);
+			return Residy(n[0], n[1], n[2]).SetSource(n);
 		}
 		else if (func == FUNC_CROSS) {
 			REQUIRE_ARGS(n, 2);
@@ -1170,7 +1185,7 @@ SubMathCtrl SubMathCtrl::Exp(Node& n, bool nobrackets)
 			SubMathCtrl der_sign =  Text("'", TYPE_OTHER);
 			return JoinFlex(x, der_sign);
 		}
-		else if ((value = n.GetFunctionName()) == "range" && (n.GetCount() == 4 || n.GetCount() == 5)) {
+		else if (value == "range" && (n.GetCount() == 4 || n.GetCount() == 5)) {
 			if (n.GetCount() == 4) {
 				return Range(n[0],n[1],n[2],n[3]).SetSource(n);
 			}

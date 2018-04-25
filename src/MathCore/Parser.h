@@ -8,6 +8,7 @@ namespace MathCore {
 String TrimQuotes(const String& s);
 Node ParseExpression(const String& expr);
 Node ParseGiacExpression(String expr);
+inline Node PE(const String& expr) {return ParseExpression(expr);}
 
 }
 

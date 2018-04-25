@@ -168,10 +168,11 @@ void Node::operator=(const Node& n) {
 	str_data = n.str_data;
 	type = n.type;
 	
-	nodes.Clear();
+	Upp::Array<Node> tmp_nodes;
 	for(int i = 0; i < n.nodes.GetCount(); i++) {
-		nodes.Add(n.nodes[i]);
+		tmp_nodes.Add(n.nodes[i]);
 	}
+	Swap(tmp_nodes, nodes);
 }
 
 bool Node::IsEqual(const Node& n) {
@@ -264,6 +265,7 @@ Node Node::Print(String title, bool lower) {
 }*/
 
 Node& Node::Floating() {
+	RemoveTypes();
 	if (IsMultiple()) {
 		for(int i = 0; i < nodes.GetCount(); i++)
 			nodes[i].Floating();
@@ -281,13 +283,13 @@ Node& Node::Solve() {
 	return *this;
 }
 
-Node& Node::Solve(Node key, bool keep_key_equality) {
+Node& Node::Solve(Node key, bool keep_equal_expr) {
 	if (IsMultiple()) {
 		for(int i = 0; i < nodes.GetCount(); i++)
 			nodes[i].Solve(key, false);
 	}
 	else *this = MathCore::SolveVar(*this, key);
-	if (keep_key_equality) {
+	if (keep_equal_expr) {
 		*this = key == *this;
 	}
 	return *this;
@@ -302,13 +304,13 @@ Node& Node::SolveComplex() {
 	return *this;
 }
 
-Node& Node::SolveComplex(Node key, bool keep_key_equality) {
+Node& Node::SolveComplex(Node key, bool keep_equal_expr) {
 	if (IsMultiple()) {
 		for(int i = 0; i < nodes.GetCount(); i++)
 			nodes[i].SolveComplex(key, false);
 	}
 	else *this = MathCore::SolveComplexVar(*this, key);
-	if (keep_key_equality) {
+	if (keep_equal_expr) {
 		*this = key == *this;
 	}
 	return *this;
@@ -323,13 +325,13 @@ Node& Node::FSolve() {
 	return *this;
 }
 
-Node& Node::FSolve(Node key, bool keep_key_equality) {
+Node& Node::FSolve(Node key, bool keep_equal_expr) {
 	if (IsMultiple()) {
 		for(int i = 0; i < nodes.GetCount(); i++)
 			nodes[i].FSolve(key, false);
 	}
 	else *this = MathCore::FSolveVar(*this, key);
-	if (keep_key_equality) {
+	if (keep_equal_expr) {
 		*this = key == *this;
 	}
 	return *this;
@@ -629,7 +631,7 @@ Node& Node::Parse(const String& expr) {
 	return *this;
 }
 
-Node& Node::Replace(Node& find, const Node replacing) {
+Node& Node::Replace(Node& find, const Node& replacing) {
 	Node tmp(find);
 	if (tmp.Compare(replacing) == 0) return *this;
 	
@@ -756,7 +758,7 @@ Node& Node::RemoveAllExceptOpId() {
 
 Node& Node::RemoveTypes() {
 	if (type == TYPE_TYPE) {
-		*this = nodes[0];
+		*this = Node(nodes[0]);
 		return RemoveTypes();
 	}
 	else {
@@ -1166,7 +1168,7 @@ void Node::Trim() {
 	if (nodes.GetCount() == 1 && (type==TYPE_PARENTHESIS || type==TYPE_NULL)) {
 		Node n = nodes[0];
 		while (n.nodes.GetCount() == 1 && (n.type==TYPE_PARENTHESIS || n.type==TYPE_NULL)) {
-			n = n.nodes[0];
+			n = Node(n.nodes[0]);
 		}
 		*this = n;
 		
@@ -1286,7 +1288,7 @@ int Node::GetOpLevel() const {
 
 String Node::GetFunctionName() const {
 	if (type != TYPE_FUNCTION) return "";
-	if (int_data == FUNC_CUSTOM) return GetString();
+	if (int_data == FUNC_CUSTOM || int_data == FUNC_UNKNOWN) return GetString();
 	switch (int_data) {
 		case FUNC_ABS:			return "abs";
 		case FUNC_LENGTH:		return "len";
@@ -1307,6 +1309,7 @@ String Node::GetFunctionName() const {
 		case FUNC_LOG:			return "log";
 		case FUNC_SUM:			return "sum";
 		case FUNC_LIMIT:		return "limit";
+		case FUNC_RESIDY:		return "residy";
 		case FUNC_PLUSMIN:		return "plusmin";
 		case FUNC_CROSS:		return "cross";
 		
@@ -1357,7 +1360,7 @@ String Node::GetTypeString() const {
 		case TYPE_OP:			return "op";
 		case TYPE_UNARY:		return "unary";
 		case TYPE_FUNCTION:		return "function";
-		case TYPE_PARENTHESIS:	return "innerhesis";
+		case TYPE_PARENTHESIS:	return "parenthesis";
 		case TYPE_ARRAY:		return "array";
 		case TYPE_MATRIX:		return "matrix";
 		case TYPE_SET:			return "set";
@@ -2090,6 +2093,12 @@ Node FunctionSum(Node expr, Node var, Node begin, Node end) {
 
 Node FunctionLimit(Node expr, Node var, Node limit) {
 	Node out = Function(FUNC_LIMIT);
+	out.Add(expr).Add(var).Add(limit);
+	return out;
+}
+
+Node FunctionResidy(Node expr, Node var, Node limit) {
+	Node out = Function(FUNC_RESIDY);
 	out.Add(expr).Add(var).Add(limit);
 	return out;
 }
