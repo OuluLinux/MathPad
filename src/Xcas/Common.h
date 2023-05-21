@@ -90,18 +90,6 @@ public:
 };
 
 
-class GenOutput : public ParentCtrl {
-	
-public:
-	//friend class Editor;
-	giac::context* ctx = NULL;
-	giac::gen value;
-	
-public:
-	virtual void Set(giac::gen& g) {value = g;}
-	virtual int GetContentHeight() {return 0;}
-};
-
 
 class CommentOutput : public ParentCtrl {
 	Label lbl;

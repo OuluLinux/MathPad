@@ -24,21 +24,38 @@
 #ifndef _Xcas_Xcas_h
 #define _Xcas_Xcas_h
 
-#include <LibGiac/gen.h>
-#include <LibGiac/prog.h>
-#include <LibGiac/mathml.h>
-#include <LibGiac/alg_ext.h>
-#include <LibGiac/usual.h>
-#include <LibGiac/rpn.h>
-#include <LibGiac/symbolic.h>
-#include <LibGiac/intg.h>
-#include <LibGiac/series.h>
-#include <LibGiac/quater.h>
+#if defined flagBUILTIN_GIAC
+	#include <LibGiac/gen.h>
+	#include <LibGiac/prog.h>
+	#include <LibGiac/mathml.h>
+	#include <LibGiac/alg_ext.h>
+	#include <LibGiac/usual.h>
+	#include <LibGiac/rpn.h>
+	#include <LibGiac/symbolic.h>
+	#include <LibGiac/intg.h>
+	#include <LibGiac/series.h>
+	#include <LibGiac/quater.h>
+#else
+	#include <giac/gen.h>
+	#include <giac/prog.h>
+	#include <giac/mathml.h>
+	#include <giac/alg_ext.h>
+	#include <giac/usual.h>
+	#include <giac/rpn.h>
+	#include <giac/symbolic.h>
+	#include <giac/intg.h>
+	#include <giac/series.h>
+	#include <giac/quater.h>
+#endif
+
+#include <LibGiac/Equation.h>
 
 #include <CtrlLib/CtrlLib.h>
 #include <PdfDraw/PdfDraw.h>
 #include <CodeEditor/CodeEditor.h>
 using namespace Upp;
+
+#include <functional>
 
 #include "Common.h"
 #include "Input.h"

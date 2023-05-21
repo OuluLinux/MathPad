@@ -1,8 +1,11 @@
 uses
 	CtrlLib,
-	LibGiac,
 	CodeEditor,
 	PdfDraw;
+
+uses(BUILTIN_GIAC) LibGiac;
+
+library(!BUILTIN_GIAC) giac;
 
 file
 	Copying,
@@ -43,6 +46,7 @@ file
 	Print_.cpp;
 
 mainconfig
+	"" = "GUI BUILTIN_GIAC USEMALLOC",
 	"" = "GUI",
 	"" = "GUI USEMALLOC";
 

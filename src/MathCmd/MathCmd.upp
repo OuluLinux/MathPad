@@ -1,0 +1,9 @@
+uses
+	LibGiac;
+
+file
+	giac_oo.cpp;
+
+mainconfig
+	"" = "";
+

@@ -5,7 +5,6 @@ uses
 
 file
 	MathCore.h,
-	MathCore.cpp,
 	Var readonly separator,
 	Node.h,
 	Node.cpp,
@@ -18,7 +17,4 @@ file
 	BackendUtils.cpp,
 	XcasGiac.h,
 	XcasGiac.cpp;
-
-mainconfig
-	"" = "";
 

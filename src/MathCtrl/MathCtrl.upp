@@ -21,6 +21,3 @@ file
 	Navigator.h,
 	Navigator.cpp;
 
-mainconfig
-	"" = "GUI USEMALLOC MATCTRL_TESTS";
-
